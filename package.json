@@ -10,10 +10,18 @@
     "type": "git",
     "url": "git+https://github.com/roman-shaposhnikov/ai-for-developers-project-386.git"
   },
+  "scripts": {
+    "api:compile": "tsp compile api/main.tsp --config api/tspconfig.yaml"
+  },
   "directories": {
     "doc": "docs"
   },
   "devDependencies": {
+    "@typespec/compiler": "^1.11.0",
+    "@typespec/http": "^1.11.0",
+    "@typespec/openapi": "^1.11.0",
+    "@typespec/openapi3": "^1.11.0",
+    "@typespec/rest": "^0.81.0",
     "skills": "^1.4.9"
   }
 }
