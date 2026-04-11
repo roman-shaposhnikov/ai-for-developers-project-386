@@ -443,6 +443,442 @@ These are intentionally excluded from this design:
 
 ---
 
+---
+
+# Part 2: Public Pages (Guest Booking Flow)
+
+## Overview
+
+Public-facing frontend for guests to browse available events and book time slots. No authentication required.
+
+**Key Principles:**
+- Simple, clean interface focused on conversion
+- Mobile-first responsive design
+- Clear error messages in user-friendly language
+- No session persistence (guest can book as many times as needed)
+
+---
+
+## Public Routes
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | PublicEventsList | Landing page with all active event types |
+| `/e/:slug` | EventBooking | Calendar view with available time slots |
+| `/e/:slug/book` | BookingForm | Guest information form |
+| `/bookings/:id/success` | BookingSuccess | Confirmation and cancellation option |
+
+**Design Decision:** Using `/e/:slug` pattern (short, memorable, cal.com-style) for public event links.
+
+---
+
+## Public Component Structure
+
+```
+src/
+├── components/
+│   ├── PublicLayout.tsx        # Minimal header + footer
+│   ├── EventCard.tsx           # Event preview card (public view)
+│   ├── CalendarPicker.tsx      # Date selection component
+│   ├── TimeSlotList.tsx        # Available slots for selected date
+│   ├── BookingForm.tsx         # Guest information form
+│   └── BookingConfirmation.tsx # Success state with cancel option
+├── pages/
+│   ├── PublicEventsList.tsx    # Landing page
+│   ├── EventBooking.tsx        # Calendar + slot selection
+│   ├── BookingFormPage.tsx     # Guest details form
+│   └── BookingSuccess.tsx      # Confirmation page
+├── api/
+│   └── public.ts               # Public API methods (no auth)
+└── utils/
+    └── date.ts                 # Date formatting utilities
+```
+
+---
+
+## Page: Public Events List (`/`)
+
+### Layout
+
+- Clean header with brand/service name
+- Main content: grid of event cards
+- Simple footer with copyright
+
+### Event Card (Public)
+
+```
+┌────────────────────────────────────────────┐
+│                                            │
+│  📅 Встреча на 30 минут                    │
+│                                            │
+│  Описание события, которое может быть     │
+│  достаточно длинным и переносится...       │
+│                                            │
+│  ⏱️ 30 минут                              │
+│                                            │
+│  [Выбрать время]                           │
+│                                            │
+└────────────────────────────────────────────┘
+```
+
+**Elements:**
+1. **Icon** — Calendar icon or event type icon
+2. **Title** — Event title (bold, larger)
+3. **Description** — Truncated to 2-3 lines with "..."
+4. **Duration badge** — Icon + duration (e.g., "⏱️ 30 минут")
+5. **CTA Button** — "Выбрать время" → navigates to `/e/:slug`
+
+### Empty State
+
+- Message: "В настоящее время нет доступных событий для бронирования"
+- Contact information placeholder (optional)
+
+### Data Loading
+
+- `GET /api/v1/public/events` — returns only `active: true` events
+- Loading skeleton (Mantine Skeleton components)
+- Error: "Не удалось загрузить события. Пожалуйста, попробуйте позже."
+
+---
+
+## Page: Event Booking (`/e/:slug`)
+
+### Layout (3-column desktop, stacked mobile)
+
+```
+┌───────────────┬────────────────────┬─────────────────┐
+│               │                    │                 │
+│  Event Info   │    Calendar        │  Time Slots    │
+│               │                    │                 │
+│  Title        │   [April 2026]     │  Tue 14        │
+│  Duration     │                    │                 │
+│  Description  │   Su Mo Tu We...   │  09:00 ●       │
+│               │                    │  09:30 ●       │
+│               │   13 14 15 16...   │  10:00 ●       │
+│               │                    │  ...           │
+│               │                    │                 │
+│   [← Back]    │                    │                 │
+│               │                    │                 │
+└───────────────┴────────────────────┴─────────────────┘
+```
+
+### Event Info Panel (Left)
+
+- **Owner name** (placeholder or from API if available)
+- **Event title** (large, bold)
+- **Duration** with icon
+- **Description** (full text, not truncated)
+- **Timezone** — "Europe/Moscow" or from API
+- **Back link** — returns to `/`
+
+### Calendar (Center)
+
+**Mantine DatePicker or custom calendar:**
+- Month navigation (prev/next arrows)
+- Day cells:
+  - Disabled: past dates, dates > 14 days from today, days disabled in schedule
+  - Enabled: available dates (have at least one slot)
+  - Selected: highlighted current selection
+  - Today: subtle indicator
+- Disabled dates: gray, not clickable
+- Available dates: clickable, subtle green dot or border
+
+**Constraints:**
+- Min date: today
+- Max date: today + 13 days (14-day window inclusive)
+- Disabled weekdays: according to schedule configuration
+
+### Time Slots Panel (Right)
+
+**Header:** Selected date (e.g., "Вторник, 14 апреля")
+
+**Slot list:**
+```
+09:00  ●──────────────  [Button style]
+09:30  ●──────────────
+10:00  ●──────────────
+...
+```
+
+**Each slot:**
+- Start time (e.g., "09:00")
+- Green indicator dot
+- Full-width button style
+- Hover: subtle highlight
+- Click: navigates to `/e/:slug/book?slot=2026-04-15T09:00:00Z`
+
+**States:**
+- Loading: "Загрузка доступного времени..."
+- No slots: "На этот день нет свободного времени. Выберите другую дату."
+- Error: "Не удалось загрузить слоты. Попробуйте обновить страницу."
+
+### API Integration
+
+- `GET /api/v1/public/events/{slug}` — event details
+- `GET /api/v1/public/events/{slug}/slots?date=YYYY-MM-DD` — slots for selected date
+- On date change: fetch new slots, show loader
+- Caching: not needed (short session, slots change frequently)
+
+---
+
+## Page: Booking Form (`/e/:slug/book`)
+
+### URL Parameters
+
+Query string: `?slot=2026-04-15T09:00:00Z`
+
+### Layout
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ← Назад к выбору времени                                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Выбранное время                                            │
+│  ╭─────────────────────────────────────────────────────╮   │
+│  │  📅 15 апреля 2026                                   │   │
+│  │  ⏱️ 09:00 – 09:30 (30 минут)                        │   │
+│  │  Встреча на 30 минут                                 │   │
+│  ╰─────────────────────────────────────────────────────╯   │
+│                                                             │
+│  Данные для записи                                          │
+│                                                             │
+│  Ваше имя *                                                 │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  Email *                                                    │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  Дополнительные сведения                                    │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  │                                                     │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  [Подтвердить бронирование]                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Selected Time Card
+
+- Event name
+- Date (localized, e.g., "15 апреля 2026, вторник")
+- Time range (start – end)
+- Duration
+- "Изменить" link → back to calendar
+
+### Form Fields
+
+| Field | Component | Validation | Required |
+|-------|-----------|------------|----------|
+| **Ваше имя** | TextInput | 1-100 chars | Yes |
+| **Email** | TextInput | Valid email format | Yes |
+| **Дополнительные сведения** | Textarea | Max 500 chars | No |
+
+### Submission
+
+- Button: "Подтвердить бронирование"
+- Loading state with spinner
+- Disabled until all required fields valid
+
+**Request:**
+```typescript
+POST /api/v1/public/events/{slug}/bookings
+{
+  "startTime": "2026-04-15T09:00:00Z",
+  "guest": {
+    "name": "Иван Петров",
+    "email": "ivan@example.com",
+    "notes": "Жду встречи"
+  }
+}
+```
+
+**Success:**
+- Response includes `cancelToken`
+- Store in URL query: `/bookings/{id}/success?token={cancelToken}`
+- Redirect to success page
+
+**Errors:**
+- 409 SLOT_UNAVAILABLE: "Извините, это время только что забронировали. Пожалуйста, выберите другое." + back button
+- 400 INVALID_SLOT_TIME: "Выбранное время недоступно. Вернитесь к календарю."
+- Network error: "Ошибка соединения. Пожалуйста, попробуйте ещё раз."
+
+---
+
+## Page: Booking Success (`/bookings/:id/success`)
+
+### URL Parameters
+
+Path: `/bookings/{id}/success`
+Query: `?token={cancelToken}`
+
+### Layout
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                    ✅ Бронирование подтверждено               │
+│                                                             │
+│  ╭─────────────────────────────────────────────────────╮   │
+│  │                                                     │   │
+│  │  📅 15 апреля 2026, 09:00–09:30                    │   │
+│  │                                                     │   │
+│  │  Встреча на 30 минут                               │   │
+│  │                                                     │   │
+│  │  Гость: Иван Петров                                │   │
+│  │  Email: ivan@example.com                           │   │
+│  │                                                     │   │
+│  │  ─────────────────────────────────────────────     │   │
+│  │                                                     │   │
+│  │  [Отменить бронирование]                           │   │
+│  │                                                     │   │
+│  ╰─────────────────────────────────────────────────────╯   │
+│                                                             │
+│  Ссылка для управления бронированием:                       │
+│  https://... (скрытая ссылка с токеном)                     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Confirmation Card
+
+- Success icon (green checkmark)
+- "Бронирование подтверждено" heading
+- Date/time
+- Event name
+- Guest details
+
+### Cancellation
+
+**Button:** "Отменить бронирование" (secondary/outlined, red text)
+
+**Flow:**
+1. Browser `confirm("Вы уверены? Это действие нельзя отменить.")`
+2. DELETE `/api/v1/public/bookings/{id}?cancelToken={token}`
+3. Success: show "Бронирование отменено" message + button to book again
+4. 403 INVALID_CANCEL_TOKEN: show error "Не удалось отменить бронирование. Возможно, ссылка устарела."
+
+### URL Sharing
+
+The URL with token allows guest to return and cancel:
+- Copy URL to clipboard button
+- Message: "Сохраните эту ссылку для управления бронированием"
+
+---
+
+## Public API Integration
+
+### Endpoints (No Auth Required)
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/public/events` | List active events only |
+| GET | `/public/events/{slug}` | Get single event details |
+| GET | `/public/events/{slug}/slots?date=` | Get available slots |
+| POST | `/public/events/{slug}/bookings` | Create booking |
+| DELETE | `/public/bookings/{id}?cancelToken=` | Cancel booking |
+
+### Error Handling (Public)
+
+| Error Code | User Message | Action |
+|------------|--------------|--------|
+| `SLOT_UNAVAILABLE` | "Извините, это время только что забронировали. Пожалуйста, выберите другое время." | Return to slot selection |
+| `DATE_OUT_OF_RANGE` | "Бронирование доступно только на ближайшие 14 дней." | Reset calendar to valid range |
+| `INVALID_SLOT_TIME` | "Выбранное время недоступно." | Return to calendar |
+| `INVALID_CANCEL_TOKEN` | "Не удалось отменить бронирование. Ссылка может быть устаревшей." | Show error state |
+| `NOT_FOUND` | "Событие или бронирование не найдено." | 404 page |
+| Network error | "Ошибка соединения. Пожалуйста, проверьте подключение и попробуйте снова." | Retry button |
+
+---
+
+## Shared Public Components
+
+### TimeSlotButton
+
+```typescript
+interface TimeSlotButtonProps {
+  startTime: string;    // Display time (09:00)
+  endTime: string;      // Display end time (09:30)
+  onClick: () => void;
+  disabled?: boolean;
+}
+```
+
+- Full-width button
+- Green dot indicator
+- Time centered
+- Hover: subtle background change
+- Active: highlighted border
+
+### CalendarDay
+
+```typescript
+interface CalendarDayProps {
+  date: Date;
+  isSelected: boolean;
+  isToday: boolean;
+  isDisabled: boolean;
+  hasSlots: boolean;    // Visual indicator of availability
+  onClick: () => void;
+}
+```
+
+- Number centered
+- Disabled: gray, not clickable
+- Has slots: subtle green dot below number
+- Selected: primary color background
+- Today: ring border
+
+### GuestInfoCard
+
+Reusable display of guest information:
+- Name
+- Email (gray)
+- Optional notes (truncated)
+
+---
+
+## Responsive Design
+
+### Breakpoints
+
+- **Desktop (>1024px):** 3-column layout on booking page
+- **Tablet (768-1024px):** 2-column (info + calendar, slots below)
+- **Mobile (<768px):** Stacked, full-width
+
+### Mobile Adaptations
+
+- **Events List:** Single column cards
+- **Booking Page:**
+  - Step 1: Event info + calendar (slots below calendar)
+  - Step 2: Form (same layout, wider)
+- **Success Page:** Centered card, full-width on small screens
+- Touch targets: minimum 44px
+
+---
+
+## Public Pages Design Decisions
+
+1. **No authentication for guests** — Frictionless booking experience. Owner is identified by system (single owner model).
+
+2. **Token in URL for cancellation** — Simplest way to allow guest to manage booking without accounts or email verification.
+
+3. **14-day calendar window** — Hardcoded limit to encourage prompt booking while keeping API load manageable.
+
+4. **Optimistic slot availability** — Slots computed at view time; race conditions handled by API 409 errors with clear messaging.
+
+5. **Single-step booking form** — All guest info collected at once. No wizard to reduce abandonment.
+
+6. **Russian UI text** — As per reference mockups and Russian context in project.
+
+---
+
 ## References
 
 - API Spec: `/workspace/docs/superpowers/specs/2026-04-11-booking-api-design.md`
