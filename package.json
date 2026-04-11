@@ -1,0 +1,19 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/roman-shaposhnikov/ai-for-developers-project-386#readme",
+  "bugs": {
+    "url": "https://github.com/roman-shaposhnikov/ai-for-developers-project-386/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roman-shaposhnikov/ai-for-developers-project-386.git"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "skills": "^1.4.9"
+  }
+}
