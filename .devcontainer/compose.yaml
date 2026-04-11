@@ -1,0 +1,14 @@
+services:
+  devcontainer:
+    user: "1000:1000"
+    env_file:
+      - ../config/env/dev.env
+    build:
+      context: ./
+    volumes:
+      - ..:/workspace
+    tty: true
+    stdin_open: true
+    working_dir: /workspace
+    command: bash
+
