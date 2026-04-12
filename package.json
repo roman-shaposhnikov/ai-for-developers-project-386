@@ -10,7 +10,17 @@
     "type": "git",
     "url": "git+https://github.com/roman-shaposhnikov/ai-for-developers-project-386.git"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:public": "playwright test public/",
+    "test:admin": "playwright test admin/",
+    "test:api": "playwright test api/",
+    "test:integration": "playwright test integration/",
+    "test:report": "playwright show-report",
+    "test:debug": "playwright test --debug"
+  },
   "directories": {
     "doc": "docs"
   },
@@ -38,5 +48,14 @@
     "simple-git-hooks": "^2.13.1",
     "skills": "^1.4.9",
     "typescript": "5.6"
+  },
+  "dependencies": {
+    "@mantine/core": "^9.0.1",
+    "@mantine/dates": "^9.0.1",
+    "@mantine/form": "^9.0.1",
+    "@mantine/hooks": "^9.0.1",
+    "@mantine/notifications": "^9.0.1",
+    "dayjs": "^1.11.20",
+    "react-router-dom": "^7.14.0"
   }
 }

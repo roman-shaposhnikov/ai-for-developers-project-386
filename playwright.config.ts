@@ -42,6 +42,9 @@ export default defineConfig({
     
     /* Headless режим в CI */
     headless: !!process.env.CI,
+    
+    /* Используем полный Chromium вместо headless shell */
+    channel: 'chromium',
   },
 
   /* Конфигурация проектов для разных браузеров */
