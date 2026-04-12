@@ -10,18 +10,33 @@
     "type": "git",
     "url": "git+https://github.com/roman-shaposhnikov/ai-for-developers-project-386.git"
   },
-  "scripts": {
-    "api:compile": "tsp compile api/main.tsp --config api/tspconfig.yaml"
-  },
+  "scripts": {},
   "directories": {
     "doc": "docs"
   },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "oxlint . --fix"
+    ]
+  },
   "devDependencies": {
+    "@playwright/cli": "^0.1.7",
+    "@playwright/mcp": "^0.0.70",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
     "@typespec/compiler": "^1.11.0",
     "@typespec/http": "^1.11.0",
     "@typespec/openapi": "^1.11.0",
     "@typespec/openapi3": "^1.11.0",
     "@typespec/rest": "^0.81.0",
-    "skills": "^1.4.9"
+    "lint-staged": "^16.4.0",
+    "openapi-typescript": "^7.13.0",
+    "oxlint": "^1.59.0",
+    "simple-git-hooks": "^2.13.1",
+    "skills": "^1.4.9",
+    "typescript": "5.6"
   }
 }
