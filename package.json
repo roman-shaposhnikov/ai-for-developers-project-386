@@ -3,13 +3,16 @@
   "version": "0.0.0",
   "type": "module",
   "workspaces": [
-    "./services/back/*",
-    "./services/front/*",
+    "services/back/*",
+    "services/front/*",
     "e2e",
-    "api",
+    "api"
   ],
   "engines": {
     "node": "^24.8.0",
     "npm": "^11.6.0"
+  },
+  "dependencies": {
+    "skills": "^1.5.0"
   }
 }
