@@ -4,35 +4,30 @@
 
 ```
 - Makefile
-- api
-- packages
-  - core
-    - application
-    - domain
-  - dal
-  - controllers
-  - ui
-- e2e    # move to packages?
+- api                  # API контракт между бэкендом и фронтендом
+- services
+    - back
+    - front
+- e2e
 - docs
 - prompts
 - config
-- .devcontainer
 ```
 
 ## Test
 
 ```bash
-make test
-make test-u
-make test-i
-make test-e
+make test         # все тесты
+make test-u       # юнит-тесты
+make test-i       # интеграционные-тесты
+make test-e       # e2e-тесты
 ```
 
-## Build
+## Dev
 
 ```bash
-make build
-make build-front
-make build-back
+make dev
+make dev-front
+make dev-back
 ```
 

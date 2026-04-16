@@ -1,0 +1,18 @@
+x-common-user: &common-user
+  user: "1000:1000"
+
+services:
+  devcontainer:
+    <<: *common-user
+    env_file:
+      - ../config/env/.env
+    build:
+      context: ./
+      target: devcontainer
+    volumes:
+      - ..:/workspace
+    tty: true
+    stdin_open: true
+    working_dir: /workspace
+    command: bash
+
