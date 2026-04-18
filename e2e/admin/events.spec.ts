@@ -6,7 +6,6 @@
 import { expect, test } from '../fixtures/test-fixtures';
 import type { Event } from '../fixtures/types';
 import {
-  adminCredentials,
   fullWeeklySchedule,
   generateUniqueSlug,
   sampleEvents,
@@ -19,7 +18,7 @@ test.describe('Admin Events List Page', () => {
   let apiClient: ReturnType<typeof createApiClient>;
 
   test.beforeEach(async ({ request }) => {
-    apiClient = createApiClient(request, adminCredentials);
+    apiClient = createApiClient(request);
     createdEvents = [];
   });
 
@@ -34,31 +33,13 @@ test.describe('Admin Events List Page', () => {
     }
   });
 
-  test('должна требовать аутентификации', async ({ page }) => {
-    await page.goto('/admin/events');
-    
-    // Проверяем, что показан диалог авторизации или редирект
-    await expect(
-      page.locator('text=Authentication, text=Authorization, input[type="password"]')
-    ).toBeVisible();
-  });
-
-  test('должна загружаться после авторизации', async ({ page }) => {
-    // Настраиваем авторизацию через HTTP Basic Auth
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
+  test('должна загружаться', async ({ page }) => {
     const adminPage = new AdminEventsListPage(page);
     await adminPage.goto();
     await adminPage.expectLoaded();
   });
 
   test('должна отображать список всех событий включая неактивные', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     // Создаём активное и неактивное событие
     const activeEvent = await apiClient.createEvent({
       ...sampleEvents[0]!,
@@ -82,10 +63,6 @@ test.describe('Admin Events List Page', () => {
   });
 
   test('должна позволять переходить к созданию нового события', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const adminPage = new AdminEventsListPage(page);
     await adminPage.goto();
     await adminPage.clickNewEvent();
@@ -95,10 +72,6 @@ test.describe('Admin Events List Page', () => {
   });
 
   test('должна позволять переходить к редактированию события', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       ...sampleEvents[0]!,
       slug: generateUniqueSlug('admin-edit-nav'),
@@ -114,10 +87,6 @@ test.describe('Admin Events List Page', () => {
   });
 
   test('должна показывать пустое состояние когда нет событий', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     // Удаляем все события
     const allEvents = await apiClient.listEvents();
     for (const event of allEvents) {
@@ -131,10 +100,6 @@ test.describe('Admin Events List Page', () => {
   });
 
   test('должна сортировать события по дате создания (новые сначала)', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     // Создаём события последовательно
     const event1 = await apiClient.createEvent({
       title: 'First Event',
@@ -168,7 +133,7 @@ test.describe('Event Create Page', () => {
   let apiClient: ReturnType<typeof createApiClient>;
 
   test.beforeEach(async ({ request }) => {
-    apiClient = createApiClient(request, adminCredentials);
+    apiClient = createApiClient(request);
     createdEvents = [];
   });
 
@@ -183,10 +148,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна загружаться с правильными полями', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
     await createPage.expectLoaded();
@@ -199,10 +160,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна позволять создать событие с валидными данными', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -230,10 +187,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна валидировать обязательные поля', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -245,10 +198,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна валидировать slug формат', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -266,10 +215,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна показывать ошибку при дублировании slug', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     // Создаём событие с определенным slug
     const existingSlug = generateUniqueSlug('duplicate-test');
     const existingEvent = await apiClient.createEvent({
@@ -297,10 +242,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна авто-генерировать slug из title', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -316,10 +257,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна авто-генерировать slug с транслитерацией кириллицы', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -333,10 +270,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна позволять отменить создание', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -354,10 +287,6 @@ test.describe('Event Create Page', () => {
   });
 
   test('должна валидировать длительность события', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -380,7 +309,7 @@ test.describe('Event Edit Page', () => {
   let apiClient: ReturnType<typeof createApiClient>;
 
   test.beforeEach(async ({ request }) => {
-    apiClient = createApiClient(request, adminCredentials);
+    apiClient = createApiClient(request);
     createdEvents = [];
   });
 
@@ -395,10 +324,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна загружаться с данными события', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Edit Page Load Test',
       description: 'Test loading edit page',
@@ -420,10 +345,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна блокировать редактирование slug', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Immutable Slug Test',
       description: 'Test immutable slug',
@@ -438,10 +359,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна позволять обновить title', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Original Title',
       description: 'Test update',
@@ -462,10 +379,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна позволять обновить длительность', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Duration Update Test',
       description: 'Test duration update',
@@ -485,10 +398,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна позволять переключать статус active/inactive', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Active Toggle Test',
       description: 'Test active toggle',
@@ -509,10 +418,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна позволять удалить событие без бронирований', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Delete Test',
       description: 'Test deletion',
@@ -542,10 +447,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна блокировать удаление события с активными бронированиями', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const event = await apiClient.createEvent({
       title: 'Protected Delete Test',
       description: 'Test protected deletion',
@@ -584,10 +485,6 @@ test.describe('Event Edit Page', () => {
   });
 
   test('должна показывать 404 для несуществующего события', async ({ page }) => {
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const editPage = new EventEditPage(page);
     await editPage.goto('non-existent-slug-12345');
 

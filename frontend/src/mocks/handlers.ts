@@ -105,12 +105,6 @@ function generateSlots(date: string, duration: number): SlotsResponse {
   };
 }
 
-// Helper to check auth
-function checkAuth(request: Request): boolean {
-  const auth = request.headers.get('Authorization');
-  return !!auth && auth.startsWith('Basic ');
-}
-
 export const handlers = [
   // ========== Public API ==========
   
@@ -217,25 +211,12 @@ export const handlers = [
   // ========== Admin API ==========
   
   // GET /api/v1/events
-  http.get('/api/v1/events', ({ request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
+  http.get('/api/v1/events', () => {
     return HttpResponse.json(mockEvents);
   }),
 
   // GET /api/v1/events/:slug
-  http.get('/api/v1/events/:slug', ({ params, request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
-    
+  http.get('/api/v1/events/:slug', ({ params }) => {
     const event = mockEvents.find(e => e.slug === params.slug);
     if (!event) {
       return HttpResponse.json(
@@ -248,13 +229,6 @@ export const handlers = [
 
   // POST /api/v1/events
   http.post('/api/v1/events', async ({ request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
-    
     const data = await request.json() as CreateEventRequest;
     
     // Check for duplicate slug
@@ -279,13 +253,6 @@ export const handlers = [
 
   // PATCH /api/v1/events/:slug
   http.patch('/api/v1/events/:slug', async ({ params, request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
-    
     const eventIndex = mockEvents.findIndex(e => e.slug === params.slug);
     if (eventIndex === -1) {
       return HttpResponse.json(
@@ -306,14 +273,7 @@ export const handlers = [
   }),
 
   // DELETE /api/v1/events/:slug
-  http.delete('/api/v1/events/:slug', ({ params, request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
-    
+  http.delete('/api/v1/events/:slug', ({ params }) => {
     const eventIndex = mockEvents.findIndex(e => e.slug === params.slug);
     if (eventIndex === -1) {
       return HttpResponse.json(
@@ -327,25 +287,12 @@ export const handlers = [
   }),
 
   // GET /api/v1/bookings
-  http.get('/api/v1/bookings', ({ request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
+  http.get('/api/v1/bookings', () => {
     return HttpResponse.json(mockBookings);
   }),
 
   // GET /api/v1/bookings/:id
-  http.get('/api/v1/bookings/:id', ({ params, request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
-    
+  http.get('/api/v1/bookings/:id', ({ params }) => {
     const booking = mockBookings.find(b => b.id === params.id);
     if (!booking) {
       return HttpResponse.json(
@@ -357,14 +304,7 @@ export const handlers = [
   }),
 
   // DELETE /api/v1/bookings/:id
-  http.delete('/api/v1/bookings/:id', ({ params, request }) => {
-    if (!checkAuth(request)) {
-      return HttpResponse.json(
-        { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } },
-        { status: 401 }
-      );
-    }
-    
+  http.delete('/api/v1/bookings/:id', ({ params }) => {
     const bookingIndex = mockBookings.findIndex(b => b.id === params.id);
     if (bookingIndex === -1) {
       return HttpResponse.json(

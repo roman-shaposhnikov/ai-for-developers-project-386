@@ -12,7 +12,6 @@ import {
 } from '../helpers/page-objects';
 import { createApiClient } from '../helpers/api-client';
 import { 
-  adminCredentials,
   generateUniqueSlug,
   getTestDate,
   fullWeeklySchedule,
@@ -25,7 +24,7 @@ test.describe('Complete User Flows', () => {
   let apiClient: ReturnType<typeof createApiClient>;
 
   test.beforeEach(async ({ request }) => {
-    apiClient = createApiClient(request, adminCredentials);
+    apiClient = createApiClient(request);
     createdEvents = [];
     createdBookings = [];
     await apiClient.updateSchedule(fullWeeklySchedule);
@@ -51,10 +50,6 @@ test.describe('Complete User Flows', () => {
 
   test('полный flow: создание события админом и бронирование гостем', async ({ page }) => {
     // === АДМИН: Создание события ===
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     const createPage = new EventCreatePage(page);
     await createPage.goto();
 
@@ -76,9 +71,6 @@ test.describe('Complete User Flows', () => {
     expect(event.title).toBe('Integration Test Event');
 
     // === ГОСТЬ: Просмотр и бронирование ===
-    // Убираем заголовки авторизации для гостевых запросов
-    await page.setExtraHTTPHeaders({});
-
     const publicPage = new PublicEventsListPage(page);
     await publicPage.goto();
     await publicPage.expectEventVisible(eventSlug);
@@ -131,10 +123,6 @@ test.describe('Complete User Flows', () => {
     createdBookings.push(booking);
 
     // === АДМИН: Просмотр бронирований ===
-    await page.setExtraHTTPHeaders({
-      'Authorization': `Basic ${Buffer.from(`${adminCredentials.username}:${adminCredentials.password}`).toString('base64')}`,
-    });
-
     // Открываем страницу бронирований (предполагается существование такой страницы)
     await page.goto('/admin/bookings');
     

@@ -185,13 +185,6 @@ export const sampleBooking: Booking = {
   createdAt: '2026-04-11T12:00:00Z',
 };
 
-// ─── Auth Fixtures ───
-
-export const adminCredentials = {
-  username: 'admin',
-  password: 'admin123',
-};
-
 // ─── Helper Functions ───
 
 /**

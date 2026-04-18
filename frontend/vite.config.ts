@@ -74,12 +74,6 @@ function generateSlots(date: string, duration: number) {
   return { date, eventSlug: 'test', duration, slots };
 }
 
-// Check Basic Auth
-function checkAuth(req: Connect.IncomingMessage): boolean {
-  const auth = req.headers['authorization'];
-  return !!auth && auth.startsWith('Basic ');
-}
-
 // Send JSON response
 function sendJson(res: any, data: any, status = 200) {
   res.statusCode = status;
@@ -199,13 +193,6 @@ function createApiMiddleware(): Connect.NextHandleFunction {
     }
 
     // ========== Admin API ==========
-
-    // All admin endpoints require auth
-    if (pathname.startsWith('/api/v1/events') || pathname.startsWith('/api/v1/bookings')) {
-      if (!checkAuth(req)) {
-        return sendJson(res, { error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } }, 401);
-      }
-    }
 
     // GET /api/v1/events
     if (pathname === '/api/v1/events' && method === 'GET') {

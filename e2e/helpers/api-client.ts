@@ -16,35 +16,19 @@ import type {
 
 const API_BASE_URL = process.env['API_URL'] || 'http://localhost:3000/api/v1';
 
-export interface ApiClientOptions {
-  auth?: {
-    username: string;
-    password: string;
-  };
-}
-
 export class ApiClient {
   private request: APIRequestContext;
   private baseUrl: string;
-  private auth: { username: string; password: string } | undefined;
 
-  constructor(request: APIRequestContext, options: ApiClientOptions = {}) {
+  constructor(request: APIRequestContext) {
     this.request = request;
     this.baseUrl = API_BASE_URL;
-    this.auth = options.auth ?? undefined;
   }
 
   private getHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {
+    return {
       'Content-Type': 'application/json',
     };
-
-    if (this.auth) {
-      const auth = Buffer.from(`${this.auth.username}:${this.auth.password}`).toString('base64');
-      headers['Authorization'] = `Basic ${auth}`;
-    }
-
-    return headers;
   }
 
   // ─── Admin: Events ───
@@ -244,9 +228,6 @@ export class ApiClient {
 /**
  * Создаёт API клиент для тестов
  */
-export function createApiClient(
-  request: APIRequestContext, 
-  auth?: { username: string; password: string }
-): ApiClient {
-  return new ApiClient(request, auth ? { auth } : {});
+export function createApiClient(request: APIRequestContext): ApiClient {
+  return new ApiClient(request);
 }

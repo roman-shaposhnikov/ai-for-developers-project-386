@@ -2,43 +2,10 @@ import type { ErrorResponse } from './types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
-export interface Credentials {
-  username: string;
-  password: string;
-}
-
 class ApiClient {
-  private credentials: Credentials | null = null;
-  private authCallbacks: ((credentials: Credentials | null) => void)[] = [];
-
-  onAuthChange(callback: (credentials: Credentials | null) => void) {
-    this.authCallbacks.push(callback);
-    return () => {
-      this.authCallbacks = this.authCallbacks.filter(cb => cb !== callback);
-    };
-  }
-
-  private notifyAuthChange() {
-    this.authCallbacks.forEach(cb => cb(this.credentials));
-  }
-
-  setCredentials(credentials: Credentials | null) {
-    this.credentials = credentials;
-    this.notifyAuthChange();
-  }
-
-  getCredentials(): Credentials | null {
-    return this.credentials;
-  }
-
-  isAuthenticated(): boolean {
-    return this.credentials !== null;
-  }
-
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {},
-    requiresAuth = false
+    options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_URL}${endpoint}`;
     
@@ -47,21 +14,11 @@ class ApiClient {
       ...((options.headers as Record<string, string>) || {}),
     };
 
-    if (requiresAuth && this.credentials) {
-      const auth = btoa(`${this.credentials.username}:${this.credentials.password}`);
-      headers['Authorization'] = `Basic ${auth}`;
-    }
-
     try {
       const response = await fetch(url, {
         ...options,
         headers,
       });
-
-      if (response.status === 401) {
-        this.setCredentials(null);
-        throw new ApiError('Authentication required', 401, 'AUTH_REQUIRED');
-      }
 
       if (!response.ok) {
         const errorData: ErrorResponse = await response.json().catch(() => ({
@@ -91,36 +48,33 @@ class ApiClient {
     }
   }
 
-  get<T>(endpoint: string, requiresAuth = false): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET' }, requiresAuth);
+  get<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  post<T>(endpoint: string, body: unknown, requiresAuth = false): Promise<T> {
+  post<T>(endpoint: string, body: unknown): Promise<T> {
     return this.request<T>(
       endpoint,
-      { method: 'POST', body: JSON.stringify(body) },
-      requiresAuth
+      { method: 'POST', body: JSON.stringify(body) }
     );
   }
 
-  patch<T>(endpoint: string, body: unknown, requiresAuth = false): Promise<T> {
+  patch<T>(endpoint: string, body: unknown): Promise<T> {
     return this.request<T>(
       endpoint,
-      { method: 'PATCH', body: JSON.stringify(body) },
-      requiresAuth
+      { method: 'PATCH', body: JSON.stringify(body) }
     );
   }
 
-  put<T>(endpoint: string, body: unknown, requiresAuth = false): Promise<T> {
+  put<T>(endpoint: string, body: unknown): Promise<T> {
     return this.request<T>(
       endpoint,
-      { method: 'PUT', body: JSON.stringify(body) },
-      requiresAuth
+      { method: 'PUT', body: JSON.stringify(body) }
     );
   }
 
-  delete(endpoint: string, requiresAuth = false): Promise<void> {
-    return this.request<void>(endpoint, { method: 'DELETE' }, requiresAuth);
+  delete(endpoint: string): Promise<void> {
+    return this.request<void>(endpoint, { method: 'DELETE' });
   }
 }
 
