@@ -1,14 +1,27 @@
 import { http, HttpResponse } from 'msw';
 import type {
   Event,
-  Booking,
   BookingWithEvent,
   BookingCreatedResponse,
   SlotsResponse,
   CreateEventRequest,
   UpdateEventRequest,
   CreateBookingRequest,
+  WeeklySchedule,
 } from '../api/types';
+
+// Default weekly schedule
+let mockSchedule: WeeklySchedule = {
+  weekdays: {
+    monday: { enabled: true, blocks: [{ start: '09:00', end: '17:00' }] },
+    tuesday: { enabled: true, blocks: [{ start: '09:00', end: '17:00' }] },
+    wednesday: { enabled: true, blocks: [{ start: '09:00', end: '17:00' }] },
+    thursday: { enabled: true, blocks: [{ start: '09:00', end: '17:00' }] },
+    friday: { enabled: true, blocks: [{ start: '09:00', end: '17:00' }] },
+    saturday: { enabled: false, blocks: [] },
+    sunday: { enabled: false, blocks: [] },
+  },
+};
 
 // Mock data storage
 const mockEvents: Event[] = [
@@ -315,5 +328,19 @@ export const handlers = [
     
     mockBookings[bookingIndex].status = 'cancelled';
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  // ========== Schedule API ==========
+  
+  // GET /api/v1/schedule
+  http.get('/api/v1/schedule', () => {
+    return HttpResponse.json(mockSchedule);
+  }),
+
+  // PUT /api/v1/schedule
+  http.put('/api/v1/schedule', async ({ request }) => {
+    const data = await request.json() as WeeklySchedule;
+    mockSchedule = data;
+    return HttpResponse.json(mockSchedule);
   }),
 ];

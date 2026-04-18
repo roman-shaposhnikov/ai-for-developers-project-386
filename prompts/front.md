@@ -1,8 +1,8 @@
 ## Стэк
 
+Используй контракт api/generated/openapi.yaml
 UI: React + TypeScript + Mantine + Vite
-Для работы с API по контракту во время разработки - [prism](https://github.com/stoplightio/prism) 
-
+Для работы с API по контракту во время разработки - [prism](https://github.com/stoplightio/prism)
 
 ## Требования
 
@@ -23,5 +23,3 @@ UI: React + TypeScript + Mantine + Vite
 - редактирование ивента: ./assets/edit-event.png
 - список встреч: ./assets/bookings-list.png
 - страница с рабочими часами: ./assets/schedule.png
-
-

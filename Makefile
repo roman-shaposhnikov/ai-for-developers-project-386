@@ -114,6 +114,11 @@ install-browsers:
 
 # ==================== MCP (Model Context Protocol) ====================
 
+chrome-debug:
+	google-chrome-stable \
+	--remote-debugging-port=9222 \
+	--user-data-dir="$HOME/.chrome-debug-profile" > /dev/null 2>&1 &
+
 # ==================== Docker/DevContainer ====================
 
 # Запустить devcontainer

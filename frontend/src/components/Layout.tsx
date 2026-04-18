@@ -32,16 +32,20 @@ export function Layout({ children }: LayoutProps) {
           color="blue"
         />
         <NavLink
+          component={RouterNavLink}
+          to="/admin/bookings"
           label="Бронирования"
           leftSection={<IconBook size={18} />}
-          disabled
-          c="dimmed"
+          active={location.pathname === '/admin/bookings'}
+          color="blue"
         />
         <NavLink
+          component={RouterNavLink}
+          to="/admin/schedule"
           label="Расписание"
           leftSection={<IconCalendar size={18} />}
-          disabled
-          c="dimmed"
+          active={location.pathname === '/admin/schedule'}
+          color="blue"
         />
 
         <Box mt="auto">

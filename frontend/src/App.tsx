@@ -1,18 +1,18 @@
-import { useEffect } from "react"
 import {
   BrowserRouter,
   Navigate,
-  Outlet,
   Route,
   Routes,
 } from "react-router-dom"
 import { BookingFormPage } from "./pages/BookingFormPage"
+import { BookingsList } from "./pages/BookingsList"
 import { BookingSuccess } from "./pages/BookingSuccess"
 import { EventBooking } from "./pages/EventBooking"
 import { EventCreate } from "./pages/EventCreate"
 import { EventEdit } from "./pages/EventEdit"
 import { EventsList } from "./pages/EventsList"
 import { PublicEventsList } from "./pages/PublicEventsList"
+import { Schedule } from "./pages/Schedule"
 
 function App() {
   return (
@@ -38,6 +38,8 @@ function App() {
           path="/admin/events/:slug/edit"
           element={<EventEdit />}
         />
+        <Route path="/admin/bookings" element={<BookingsList />} />
+        <Route path="/admin/schedule" element={<Schedule />} />
 
         {/* 404 fallback */}
         <Route
