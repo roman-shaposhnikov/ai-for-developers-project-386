@@ -3,17 +3,17 @@
  * @see /workspace/docs/superpowers/specs/2026-04-11-booking-api-design.md
  */
 
-import { test, expect } from '../fixtures/test-fixtures';
-import { createApiClient } from '../helpers/api-client';
-import { 
+import { expect, test } from '../fixtures/test-fixtures';
+import type { BookingCreatedResponse, Event } from '../fixtures/types';
+import {
   adminCredentials,
+  fullWeeklySchedule,
   generateUniqueSlug,
   getTestDate,
-  fullWeeklySchedule,
-  sampleGuests,
   newEventData,
+  sampleGuests,
 } from '../fixtures/test-data';
-import type { Event, BookingCreatedResponse } from '../fixtures/types';
+import { createApiClient } from '../helpers/api-client';
 
 test.describe('API Integration Tests', () => {
   let createdEvents: Event[] = [];
@@ -122,7 +122,7 @@ test.describe('API Integration Tests', () => {
       expect(slotsResponse.slots.length).toBeGreaterThan(0);
 
       // Проверяем структуру слота
-      const firstSlot = slotsResponse.slots[0];
+      const firstSlot = slotsResponse.slots[0]!;
       expect(firstSlot.startTime).toBeDefined();
       expect(firstSlot.endTime).toBeDefined();
     });
@@ -150,7 +150,7 @@ test.describe('API Integration Tests', () => {
       date.setDate(date.getDate() + diff);
       const saturday = date.toISOString().split('T')[0];
 
-      const slotsResponse = await publicApiClient.getSlots(event.slug, saturday);
+      const slotsResponse = await publicApiClient.getSlots(event.slug, saturday!);
 
       expect(slotsResponse.slots).toHaveLength(0);
     });
@@ -198,7 +198,7 @@ test.describe('API Integration Tests', () => {
       // Создаём бронирование на 9:00
       const booking = await apiClient.createBooking(event.slug, {
         startTime: `${tomorrow}T09:00:00Z`,
-        guest: sampleGuests[0],
+        guest: sampleGuests[0]!,
       });
       createdBookings.push(booking);
 
@@ -225,7 +225,7 @@ test.describe('API Integration Tests', () => {
       const tomorrow = getTestDate(1);
       const booking = await apiClient.createBooking(event.slug, {
         startTime: `${tomorrow}T09:00:00Z`,
-        guest: sampleGuests[0],
+        guest: sampleGuests[0]!,
       });
       createdBookings.push(booking);
 
@@ -235,8 +235,8 @@ test.describe('API Integration Tests', () => {
       expect(booking.startTime).toBe(`${tomorrow}T09:00:00Z`);
       expect(booking.status).toBe('active');
       expect(booking.cancelToken).toBeDefined();
-      expect(booking.guest.name).toBe(sampleGuests[0].name);
-      expect(booking.guest.email).toBe(sampleGuests[0].email);
+      expect(booking.guest.name).toBe(sampleGuests[0]!.name);
+      expect(booking.guest.email).toBe(sampleGuests[0]!.email);
     });
 
     test('должен возвращать 409 при бронировании занятого слота', async () => {
@@ -252,7 +252,7 @@ test.describe('API Integration Tests', () => {
       // Создаём первое бронирование
       const booking1 = await apiClient.createBooking(event.slug, {
         startTime: `${tomorrow}T09:00:00Z`,
-        guest: sampleGuests[0],
+        guest: sampleGuests[0]!,
       });
       createdBookings.push(booking1);
 
@@ -260,7 +260,7 @@ test.describe('API Integration Tests', () => {
       await expect(
         apiClient.createBooking(event.slug, {
           startTime: `${tomorrow}T09:00:00Z`,
-          guest: sampleGuests[1],
+          guest: sampleGuests[1]!,
         })
       ).rejects.toThrow();
     });
@@ -279,7 +279,7 @@ test.describe('API Integration Tests', () => {
       await expect(
         apiClient.createBooking(event.slug, {
           startTime: `${tomorrow}T09:05:00Z`,
-          guest: sampleGuests[0],
+          guest: sampleGuests[0]!,
         })
       ).rejects.toThrow();
     });
@@ -295,7 +295,7 @@ test.describe('API Integration Tests', () => {
       const tomorrow = getTestDate(1);
       const booking = await apiClient.createBooking(event.slug, {
         startTime: `${tomorrow}T09:00:00Z`,
-        guest: sampleGuests[0],
+        guest: sampleGuests[0]!,
       });
       createdBookings.push(booking);
 
@@ -319,7 +319,7 @@ test.describe('API Integration Tests', () => {
       const tomorrow = getTestDate(1);
       const booking = await apiClient.createBooking(event.slug, {
         startTime: `${tomorrow}T09:00:00Z`,
-        guest: sampleGuests[0],
+        guest: sampleGuests[0]!,
       });
       createdBookings.push(booking);
 

@@ -3,17 +3,16 @@
  * @see /workspace/docs/superpowers/specs/2026-04-11-admin-events-design.md
  */
 
-import { test, expect } from '../fixtures/test-fixtures';
-import { AdminEventsListPage, EventCreatePage, EventEditPage } from '../helpers/page-objects';
-import { createApiClient } from '../helpers/api-client';
-import { 
+import { expect, test } from '../fixtures/test-fixtures';
+import type { Event } from '../fixtures/types';
+import {
   adminCredentials,
+  fullWeeklySchedule,
   generateUniqueSlug,
   sampleEvents,
-  invalidEventData,
-  fullWeeklySchedule,
 } from '../fixtures/test-data';
-import type { Event, BookingCreatedResponse } from '../fixtures/types';
+import { createApiClient } from '../helpers/api-client';
+import { AdminEventsListPage, EventCreatePage, EventEditPage } from '../helpers/page-objects';
 
 test.describe('Admin Events List Page', () => {
   let createdEvents: Event[] = [];
@@ -62,13 +61,13 @@ test.describe('Admin Events List Page', () => {
 
     // Создаём активное и неактивное событие
     const activeEvent = await apiClient.createEvent({
-      ...sampleEvents[0],
+      ...sampleEvents[0]!,
       slug: generateUniqueSlug('admin-active'),
     });
     createdEvents.push(activeEvent);
 
     const inactiveEvent = await apiClient.createEvent({
-      ...sampleEvents[1],
+      ...sampleEvents[1]!,
       slug: generateUniqueSlug('admin-inactive'),
       active: false,
     });
@@ -101,7 +100,7 @@ test.describe('Admin Events List Page', () => {
     });
 
     const event = await apiClient.createEvent({
-      ...sampleEvents[0],
+      ...sampleEvents[0]!,
       slug: generateUniqueSlug('admin-edit-nav'),
     });
     createdEvents.push(event);

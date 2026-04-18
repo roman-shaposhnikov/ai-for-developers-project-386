@@ -114,22 +114,15 @@ install-browsers:
 
 # ==================== MCP (Model Context Protocol) ====================
 
-# Запустить Playwright MCP сервер (для AI-агентов)
-mcp:
-	npx @playwright/mcp@latest
-
-# Запустить MCP сервер на конкретном порту (для удаленного доступа)
-mcp-server:
-	npx @playwright/mcp@latest --port 8931
-
 # ==================== Docker/DevContainer ====================
 
 # Запустить devcontainer
 dc:
-	docker compose -f .devcontainer/compose.yaml run --rm devcontainer
+	docker compose -f .devcontainer/compose.yaml up -d devcontainer
 
 dcr:
-	docker compose -f .devcontainer/compose.yaml run --build --rm devcontainer
+	docker compose -f .devcontainer/compose.yaml build --no-cache devcontainer && \
+	docker compose -f .devcontainer/compose.yaml up -d devcontainer
 
 # Build all Docker images
 docker-build:

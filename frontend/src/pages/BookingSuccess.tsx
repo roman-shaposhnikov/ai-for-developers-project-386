@@ -63,7 +63,7 @@ export function BookingSuccess() {
   }, [fetchBooking]);
 
   const handleCopyLink = async () => {
-    if (!id || !token) return;
+    if (!id || !token || typeof window === 'undefined') return;
     
     const url = `${window.location.origin}/bookings/${id}/success?token=${encodeURIComponent(token)}`;
     
@@ -243,7 +243,7 @@ export function BookingSuccess() {
                   </Text>
                   <Group mt="xs">
                     <Text size="sm" c="dimmed" style={{ wordBreak: 'break-all' }}>
-                      {`${window.location.origin}/bookings/${id}/success?token=...`}
+                      {typeof window !== 'undefined' ? `${window.location.origin}/bookings/${id}/success?token=...` : '/bookings/${id}/success?token=...'}
                     </Text>
                     <Button
                       variant="subtle"

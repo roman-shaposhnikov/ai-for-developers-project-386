@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Button,
   Group,
@@ -11,7 +11,7 @@ import {
 import { IconArrowLeft, IconTrash, IconAlertCircle } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { EventForm } from '../components/EventForm';
+import { EventForm, type EventFormRef } from '../components/EventForm';
 import { Layout } from '../components/Layout';
 import { eventsApi, ApiError } from '../api';
 import type { Event, EventFormData } from '../api/types';
@@ -19,6 +19,7 @@ import type { Event, EventFormData } from '../api/types';
 export function EventEdit() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+  const formRef = useRef<EventFormRef>(null);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -181,6 +182,7 @@ export function EventEdit() {
 
       <Box maw={600}>
         <EventForm
+          ref={formRef}
           initialData={event}
           isEdit={true}
           onSubmit={handleSubmit}
@@ -209,10 +211,7 @@ export function EventEdit() {
               Отмена
             </Button>
             <Button
-              onClick={() => {
-                const form = document.querySelector('form');
-                form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-              }}
+              onClick={() => formRef.current?.submit()}
               loading={isSubmitting}
               color="blue"
               disabled={isDeleting}

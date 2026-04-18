@@ -3,18 +3,17 @@
  * @see /workspace/docs/superpowers/specs/2026-04-11-admin-events-design.md
  */
 
-import { test, expect } from '../fixtures/test-fixtures';
-import { EventBookingPage, BookingFormPage, PublicEventsListPage } from '../helpers/page-objects';
-import { createApiClient } from '../helpers/api-client';
-import { 
+import { expect, test } from '../fixtures/test-fixtures';
+import type { BookingCreatedResponse, Event } from '../fixtures/types';
+import {
   adminCredentials,
+  fullWeeklySchedule,
   generateUniqueSlug,
   getTestDate,
-  fullWeeklySchedule,
   sampleGuests,
-  defaultWeeklySchedule,
 } from '../fixtures/test-data';
-import type { Event, BookingCreatedResponse } from '../fixtures/types';
+import { createApiClient } from '../helpers/api-client';
+import { BookingFormPage, EventBookingPage } from '../helpers/page-objects';
 
 test.describe('Event Booking Page', () => {
   let createdEvents: Event[] = [];
@@ -120,7 +119,7 @@ test.describe('Event Booking Page', () => {
     date.setDate(date.getDate() + diff);
     const saturday = date.toISOString().split('T')[0];
 
-    await bookingPage.selectDate(saturday);
+    await bookingPage.selectDate(saturday!);
 
     // Проверяем сообщение об отсутствии слотов
     await bookingPage.expectNoSlotsAvailable();
@@ -166,7 +165,7 @@ test.describe('Event Booking Page', () => {
     const yesterdayCell = page.locator(`[data-date="${yesterday}"]`);
     
     // Вчерашняя дата должна быть disabled
-    await expect(yesterdayCell).toHaveAttribute(/disabled|aria-disabled/, /.*/);
+    await expect(yesterdayCell).toHaveAttribute('disabled');
   });
 
   test('должна блокировать выбор дат вне 14-дневного окна', async ({ page }) => {
@@ -186,7 +185,7 @@ test.describe('Event Booking Page', () => {
     const futureCell = page.locator(`[data-date="${farFuture}"]`);
     
     // Дата вне окна должна быть disabled
-    await expect(futureCell).toHaveAttribute(/disabled|aria-disabled/, /.*/);
+    await expect(futureCell).toHaveAttribute('disabled');
   });
 
   test('должна отображать информацию о событии', async ({ page }) => {
@@ -268,7 +267,7 @@ test.describe('Event Booking Page', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -278,6 +277,6 @@ test.describe('Event Booking Page', () => {
 
     // Проверяем, что 9:00 отмечен как недоступный
     const slot9am = page.locator('[data-time="09:00"], button:has-text("09:00")');
-    await expect(slot9am).toHaveAttribute(/disabled|aria-disabled/, /.*/);
+    await expect(slot9am).toHaveAttribute('disabled');
   });
 });

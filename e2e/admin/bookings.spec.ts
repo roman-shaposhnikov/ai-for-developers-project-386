@@ -60,7 +60,7 @@ test.describe('Admin Bookings Management', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -71,7 +71,7 @@ test.describe('Admin Bookings Management', () => {
     
     const foundBooking = bookings.find(b => b.id === booking.id);
     expect(foundBooking).toBeDefined();
-    expect(foundBooking?.guest.name).toBe(sampleGuests[0].name);
+    expect(foundBooking?.guest.name).toBe(sampleGuests[0]!.name);
     expect(foundBooking?.event.title).toBe(event.title);
   });
 
@@ -88,7 +88,7 @@ test.describe('Admin Bookings Management', () => {
     const tomorrow = getTestDate(1);
     const activeBooking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(activeBooking);
 
@@ -115,13 +115,13 @@ test.describe('Admin Bookings Management', () => {
 
     const booking2 = await apiClient.createBooking(event.slug, {
       startTime: `${dayAfterTomorrow}T09:00:00Z`,
-      guest: sampleGuests[1],
+      guest: sampleGuests[1]!,
     });
     createdBookings.push(booking2);
 
     const booking1 = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T10:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking1);
 
@@ -146,7 +146,7 @@ test.describe('Admin Bookings Management', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -154,8 +154,8 @@ test.describe('Admin Bookings Management', () => {
 
     expect(bookingDetails).toBeDefined();
     expect(bookingDetails.id).toBe(booking.id);
-    expect(bookingDetails.guest.name).toBe(sampleGuests[0].name);
-    expect(bookingDetails.guest.email).toBe(sampleGuests[0].email);
+    expect(bookingDetails.guest.name).toBe(sampleGuests[0]!.name);
+    expect(bookingDetails.guest.email).toBe(sampleGuests[0]!.email);
     expect(bookingDetails.event.title).toBe(event.title);
     expect(bookingDetails.event.slug).toBe(event.slug);
     expect(bookingDetails.event.duration).toBe(event.duration);
@@ -179,7 +179,7 @@ test.describe('Admin Bookings Management', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -204,7 +204,7 @@ test.describe('Admin Bookings Management', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -236,13 +236,13 @@ test.describe('Admin Bookings Management', () => {
     
     const booking1 = await apiClient.createBooking(event1.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking1);
 
     const booking2 = await apiClient.createBooking(event2.slug, {
       startTime: `${tomorrow}T14:00:00Z`,
-      guest: sampleGuests[1],
+      guest: sampleGuests[1]!,
     });
     createdBookings.push(booking2);
 

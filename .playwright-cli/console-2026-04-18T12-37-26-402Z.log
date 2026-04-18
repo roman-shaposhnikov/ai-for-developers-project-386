@@ -1,0 +1,41 @@
+[  398358ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=c40f05dc:14337
+[  399047ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3160
+[  399047ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3161
+[  399047ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3162
+[  399047ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3163
+[  399047ms] [LOG] Client ID: %s (%s) 83582696-5232-43a3-8c89-5083a16abc78 top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3164
+[  399048ms] [LOG] [MSW] Mock Service Worker started @ http://localhost:8080/src/main.tsx:24
+[  399546ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[  399622ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 6985836ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7414405ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968
+[ 7675121ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=c40f05dc:14337
+[ 7675374ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3160
+[ 7675374ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3161
+[ 7675374ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3162
+[ 7675374ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3163
+[ 7675374ms] [LOG] Client ID: %s (%s) 88d089c2-1042-4ae4-ab37-378d9dc272ac top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3164
+[ 7675375ms] [LOG] [MSW] Mock Service Worker started @ http://localhost:8080/src/main.tsx:24
+[ 7675589ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7675640ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7677444ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968
+[ 7682140ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=c40f05dc:14337
+[ 7682728ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3160
+[ 7682728ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3161
+[ 7682728ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3162
+[ 7682728ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3163
+[ 7682728ms] [LOG] Client ID: %s (%s) 6fc67a06-0673-48f4-89e8-f2f32025d7fc top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3164
+[ 7682729ms] [LOG] [MSW] Mock Service Worker started @ http://localhost:8080/src/main.tsx:24
+[ 7682887ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7682951ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7700807ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968
+[ 7864605ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=c40f05dc:14337
+[ 7864754ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3160
+[ 7864754ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3161
+[ 7864754ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3162
+[ 7864754ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3163
+[ 7864755ms] [LOG] Client ID: %s (%s) 90e531f0-5288-4451-98d1-ff1148eec565 top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=c40f05dc:3164
+[ 7864755ms] [LOG] [MSW] Mock Service Worker started @ http://localhost:8080/src/main.tsx:24
+[ 7864901ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7864934ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[ 7942539ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968

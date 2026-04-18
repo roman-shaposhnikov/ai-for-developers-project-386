@@ -2,21 +2,19 @@
  * API Client для взаимодействия с бэкендом в тестах
  */
 
-import { Page, APIRequestContext } from '@playwright/test';
-import { 
-  Event, 
+import type { APIRequestContext } from '@playwright/test';
+import type { 
+  BookingCreatedResponse,
+  BookingWithEvent,
+  CreateBookingRequest,
   CreateEventRequest, 
+  Event, 
+  SlotsResponse,
   UpdateEventRequest, 
   WeeklySchedule, 
-  Booking, 
-  BookingWithEvent,
-  BookingCreatedResponse,
-  CreateBookingRequest,
-  SlotsResponse,
-  Guest,
 } from '../fixtures/types';
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:3000/api/v1';
+const API_BASE_URL = process.env['API_URL'] || 'http://localhost:3000/api/v1';
 
 export interface ApiClientOptions {
   auth?: {
@@ -28,12 +26,12 @@ export interface ApiClientOptions {
 export class ApiClient {
   private request: APIRequestContext;
   private baseUrl: string;
-  private auth?: { username: string; password: string };
+  private auth: { username: string; password: string } | undefined;
 
   constructor(request: APIRequestContext, options: ApiClientOptions = {}) {
     this.request = request;
     this.baseUrl = API_BASE_URL;
-    this.auth = options.auth;
+    this.auth = options.auth ?? undefined;
   }
 
   private getHeaders(): Record<string, string> {
@@ -250,5 +248,5 @@ export function createApiClient(
   request: APIRequestContext, 
   auth?: { username: string; password: string }
 ): ApiClient {
-  return new ApiClient(request, { auth });
+  return new ApiClient(request, auth ? { auth } : {});
 }

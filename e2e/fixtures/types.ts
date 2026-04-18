@@ -20,6 +20,7 @@ export interface CreateEventRequest {
   description: string;
   duration: number;
   slug: string;
+  active?: boolean;
 }
 
 export interface UpdateEventRequest {

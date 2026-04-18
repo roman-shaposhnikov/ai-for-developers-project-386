@@ -1,6 +1,6 @@
-import { Stack, Button, Text, Box } from '@mantine/core';
-import { formatTime, formatDayOfWeek, formatDate } from '../utils/date';
+import { Box, Button, Stack, Text } from '@mantine/core';
 import type { Slot } from '../api/types';
+import { formatDate, formatDayOfWeek, formatTime } from '../utils/date';
 
 interface TimeSlotListProps {
   slots: Slot[];
@@ -65,17 +65,17 @@ export function TimeSlotList({
               leftSection={
                 <Box
                   style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
                     backgroundColor: isSelected ? 'white' : '#40c057',
+                    borderRadius: '50%',
+                    height: 8,
+                    width: 8,
                   }}
                 />
               }
               styles={{
                 root: {
-                  height: 44,
                   border: isSelected ? '2px solid #228be6' : undefined,
+                  height: 44,
                 },
               }}
             >

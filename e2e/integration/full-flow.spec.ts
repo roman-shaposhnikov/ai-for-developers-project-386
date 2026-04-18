@@ -4,12 +4,11 @@
 
 import { test, expect } from '../fixtures/test-fixtures';
 import { 
-  PublicEventsListPage, 
-  EventBookingPage, 
   BookingFormPage, 
   BookingSuccessPage,
-  AdminEventsListPage,
+  EventBookingPage, 
   EventCreatePage,
+  PublicEventsListPage, 
 } from '../helpers/page-objects';
 import { createApiClient } from '../helpers/api-client';
 import { 
@@ -222,7 +221,7 @@ test.describe('Complete User Flows', () => {
 
     // Проверяем, что слот 09:00 недоступен
     const slot9am = page.locator('[data-time="09:00"]');
-    await expect(slot9am).toHaveAttribute(/disabled|aria-disabled/, /.*/);
+    await expect(slot9am).toHaveAttribute('disabled');
 
     // Пытаемся забронировать через прямой переход (обход UI)
     const formPage = new BookingFormPage(page);

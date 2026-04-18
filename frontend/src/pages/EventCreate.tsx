@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Button,
   Group,
@@ -9,13 +9,14 @@ import {
 import { IconArrowLeft } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, Link } from 'react-router-dom';
-import { EventForm } from '../components/EventForm';
+import { EventForm, type EventFormRef } from '../components/EventForm';
 import { Layout } from '../components/Layout';
 import { eventsApi, ApiError } from '../api';
 import type { EventFormData } from '../api/types';
 
 export function EventCreate() {
   const navigate = useNavigate();
+  const formRef = useRef<EventFormRef>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
 
@@ -80,6 +81,7 @@ export function EventCreate() {
 
       <Box maw={600}>
         <EventForm
+          ref={formRef}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           slugError={slugError}
@@ -95,10 +97,7 @@ export function EventCreate() {
             Отмена
           </Button>
           <Button
-            onClick={() => {
-              const form = document.querySelector('form');
-              form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }}
+            onClick={() => formRef.current?.submit()}
             loading={isSubmitting}
             color="blue"
           >

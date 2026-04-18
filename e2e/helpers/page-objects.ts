@@ -2,7 +2,8 @@
  * Page Object Models для E2E тестов
  */
 
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 // ─── Public Pages ───
 
@@ -38,6 +39,11 @@ export class PublicEventsListPage {
     const card = this.getEventCardBySlug(slug);
     const button = card.locator('button:has-text("Выбрать время"), button:has-text("Book")');
     await button.click();
+  }
+
+  async expectEventVisible(slug: string) {
+    const card = this.getEventCardBySlug(slug);
+    await expect(card).toBeVisible();
   }
 }
 
@@ -125,7 +131,7 @@ export class BookingFormPage {
     await this.submitButton.click();
   }
 
-  async expectValidationError(field: 'name' | 'email', message?: string) {
+  async expectValidationError(_field: 'name' | 'email', message?: string) {
     const errorSelector = message 
       ? `text=${message}` 
       : '[data-testid="error"], .error, .mantine-InputWrapper-error';
@@ -177,6 +183,7 @@ export class AdminEventsListPage {
   readonly newEventButton: Locator;
   readonly eventCards: Locator;
   readonly sidebar: Locator;
+  readonly emptyState: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -184,6 +191,7 @@ export class AdminEventsListPage {
     this.newEventButton = page.locator('a:has-text("New"), a:has-text("Создать"), button:has-text("New")');
     this.eventCards = page.locator('[data-testid="event-card-admin"], .event-card');
     this.sidebar = page.locator('[data-testid="sidebar"], aside');
+    this.emptyState = page.locator('[data-testid="empty-state"], .empty-state, text=Нет событий, text=No events');
   }
 
   async goto() {

@@ -3,16 +3,16 @@
  * @see /workspace/docs/superpowers/specs/2026-04-11-admin-events-design.md
  */
 
-import { test, expect } from '../fixtures/test-fixtures';
-import { PublicEventsListPage, EventBookingPage } from '../helpers/page-objects';
-import { createApiClient } from '../helpers/api-client';
-import { 
-  sampleEvents, 
-  adminCredentials,
-  generateUniqueSlug,
-  fullWeeklySchedule,
-} from '../fixtures/test-data';
+import { expect, test } from '../fixtures/test-fixtures';
 import type { Event } from '../fixtures/types';
+import {
+  adminCredentials,
+  fullWeeklySchedule,
+  generateUniqueSlug,
+  sampleEvents,
+} from '../fixtures/test-data';
+import { createApiClient } from '../helpers/api-client';
+import { EventBookingPage, PublicEventsListPage } from '../helpers/page-objects';
 
 test.describe('Public Events List Page', () => {
   let createdEvents: Event[] = [];
@@ -53,13 +53,13 @@ test.describe('Public Events List Page', () => {
   test('должна отображать только активные события', async ({ page }) => {
     // Создаём активное и неактивное событие
     const activeEvent = await apiClient.createEvent({
-      ...sampleEvents[0],
+      ...sampleEvents[0]!,
       slug: generateUniqueSlug('active-test'),
     });
     createdEvents.push(activeEvent);
 
     const inactiveEvent = await apiClient.createEvent({
-      ...sampleEvents[1],
+      ...sampleEvents[1]!,
       slug: generateUniqueSlug('inactive-test'),
       active: false,
     });
@@ -148,13 +148,13 @@ test.describe('Public Events List Page', () => {
   test('должна корректно отображать события в правильном порядке', async ({ page }) => {
     // Создаём события с разными датами создания
     const event1 = await apiClient.createEvent({
-      ...sampleEvents[0],
+      ...sampleEvents[0]!,
       slug: generateUniqueSlug('order-test-1'),
     });
     createdEvents.push(event1);
 
     const event2 = await apiClient.createEvent({
-      ...sampleEvents[1],
+      ...sampleEvents[1]!,
       slug: generateUniqueSlug('order-test-2'),
     });
     createdEvents.push(event2);

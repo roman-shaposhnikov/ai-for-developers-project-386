@@ -3,18 +3,16 @@
  * Использует Playwright route interception
  */
 
-import { Page, APIRequestContext } from '@playwright/test';
-import { 
-  Event, 
-  Booking, 
+import type { Page } from '@playwright/test';
+import type { 
   BookingCreatedResponse,
-  WeeklySchedule,
-  SlotsResponse,
-  Guest,
-  CreateEventRequest,
-  UpdateEventRequest,
   CreateBookingRequest,
+  CreateEventRequest,
   ErrorResponse,
+  Event, 
+  SlotsResponse,
+  UpdateEventRequest,
+  WeeklySchedule,
 } from '../fixtures/types';
 
 const API_BASE = 'http://localhost:3000/api/v1';
@@ -185,7 +183,7 @@ export class ApiMock {
         const body = await route.request().postDataJSON() as WeeklySchedule;
         
         // Validate no overlapping blocks
-        for (const [day, daySchedule] of Object.entries(body.weekdays)) {
+        for (const [_day, daySchedule] of Object.entries(body.weekdays)) {
           if (daySchedule.enabled && daySchedule.blocks.length > 1) {
             for (let i = 0; i < daySchedule.blocks.length - 1; i++) {
               const current = daySchedule.blocks[i];
@@ -336,7 +334,7 @@ export class ApiMock {
           return route.fulfill({ status: 400, body: JSON.stringify(error) });
         }
 
-        const event = this.storage.events.get(eventSlug);
+        const event = eventSlug ? this.storage.events.get(eventSlug) : undefined;
         if (!event || !event.active) {
           const error: ErrorResponse = {
             error: { code: 'NOT_FOUND', message: 'Event not found' }
@@ -346,7 +344,8 @@ export class ApiMock {
 
         // Generate slots based on schedule
         const schedule = this.storage.schedule || this.getDefaultSchedule();
-        const dayOfWeek = requestedDate.toLocaleDateString('en-US', { weekday: 'monday' }).toLowerCase();
+        const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const dayOfWeek = weekdays[requestedDate.getDay()];
         const daySchedule = schedule.weekdays[dayOfWeek as keyof typeof schedule.weekdays];
 
         let slots: { startTime: string; endTime: string }[] = [];
@@ -383,8 +382,8 @@ export class ApiMock {
         });
 
         const response: SlotsResponse = {
-          date,
-          eventSlug,
+          date: date!,
+          eventSlug: eventSlug!,
           duration: event.duration,
           slots,
         };
@@ -393,7 +392,7 @@ export class ApiMock {
       }
 
       // Regular event read
-      const event = this.storage.events.get(slug);
+      const event = slug ? this.storage.events.get(slug) : undefined;
       if (!event || !event.active) {
         const error: ErrorResponse = {
           error: { code: 'NOT_FOUND', message: 'Event not found' }
@@ -413,7 +412,7 @@ export class ApiMock {
       const url = new URL(route.request().url());
       const slug = url.pathname.split('/').slice(-2)[0];
       
-      const event = this.storage.events.get(slug);
+      const event = slug ? this.storage.events.get(slug) : undefined;
       if (!event || !event.active) {
         const error: ErrorResponse = {
           error: { code: 'NOT_FOUND', message: 'Event not found' }

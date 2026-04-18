@@ -75,7 +75,7 @@ export function BookingForm({
     const guest: Guest = {
       name,
       email,
-      notes: notes || undefined,
+      ...(notes ? { notes } : {}),
     };
 
     try {

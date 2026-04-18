@@ -2,7 +2,7 @@
  * Тестовые данные и fixtures для E2E тестов
  */
 
-import { Event, CreateEventRequest, WeeklySchedule, DaySchedule, Booking, Guest } from './types';
+import type { Booking, CreateEventRequest, DaySchedule, Event, Guest, WeeklySchedule } from './types';
 
 // ─── Event Fixtures ───
 
@@ -181,7 +181,7 @@ export const sampleBooking: Booking = {
   eventId: 'event-1',
   startTime: '2026-04-15T09:00:00Z',
   status: 'active',
-  guest: sampleGuests[0],
+  guest: sampleGuests[0]!,
   createdAt: '2026-04-11T12:00:00Z',
 };
 
@@ -215,7 +215,7 @@ export function generateUniqueEmail(prefix: string = 'test'): string {
 export function getTestDate(daysFromNow: number = 1): string {
   const date = new Date();
   date.setDate(date.getDate() + daysFromNow);
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split('T')[0]!;
 }
 
 /**
@@ -226,7 +226,7 @@ export function getNextMonday(): string {
   const day = date.getDay();
   const diff = date.getDate() - day + (day === 0 ? -6 : 1) + 7;
   date.setDate(diff);
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split('T')[0]!;
 }
 
 /**

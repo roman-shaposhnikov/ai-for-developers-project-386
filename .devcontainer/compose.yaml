@@ -1,59 +1,18 @@
 services:
-  # ─── Dev Container (for general development) ───
   devcontainer:
-    env_file:
-      - ../config/env/dev.env
-    build:
-      context: ../
-      dockerfile: .devcontainer/Dockerfile
-      target: development
-    volumes:
-      - ..:/workspace
-      - opencode:/home/node/.config/opencode
-      - node_modules:/workspace/node_modules
-      - frontend_node_modules:/workspace/frontend/node_modules
-    tty: true
-    stdin_open: true
-    working_dir: /workspace
-    command: bash
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-
-  # ─── Frontend Service ───
-  frontend:
     user: "1000:1000"
     env_file:
       - ../config/env/dev.env
     build:
-      context: ../
-      dockerfile: .devcontainer/Dockerfile
-      target: frontend
+      context: ./
+      target: devcontainer
+    working_dir: /workspace
     volumes:
-      - ../frontend:/workspace/frontend
-      - frontend_node_modules:/workspace/frontend/node_modules
-      - ../e2e:/workspace/e2e
-    working_dir: /workspace/frontend
+      - ..:/workspace
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:3000/api/v1
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5173"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      - "8080:8080"
+      - "3000:3000"
+    tty: true
+    stdin_open: true
+    command: bash
 
-volumes:
-  opencode:
-  node_modules:
-  frontend_node_modules:
-  test-results:
-
-networks:
-  app-network:
-    driver: bridge

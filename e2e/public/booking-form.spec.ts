@@ -3,18 +3,18 @@
  * @see /workspace/docs/superpowers/specs/2026-04-11-admin-events-design.md
  */
 
-import { test, expect } from '../fixtures/test-fixtures';
-import { BookingFormPage, BookingSuccessPage, EventBookingPage } from '../helpers/page-objects';
-import { createApiClient } from '../helpers/api-client';
-import { 
+import { expect, test } from '../fixtures/test-fixtures';
+import type { BookingCreatedResponse, Event } from '../fixtures/types';
+import {
   adminCredentials,
+  fullWeeklySchedule,
   generateUniqueSlug,
   getTestDate,
-  fullWeeklySchedule,
-  sampleGuests,
   invalidGuestData,
+  sampleGuests,
 } from '../fixtures/test-data';
-import type { Event, BookingCreatedResponse } from '../fixtures/types';
+import { createApiClient } from '../helpers/api-client';
+import { BookingFormPage, BookingSuccessPage } from '../helpers/page-objects';
 
 test.describe('Booking Form Page', () => {
   let createdEvents: Event[] = [];
@@ -84,13 +84,13 @@ test.describe('Booking Form Page', () => {
     const formPage = new BookingFormPage(page);
     await formPage.goto(event.slug, slotTime);
     
-    await formPage.fillGuestInfo(sampleGuests[0]);
+    await formPage.fillGuestInfo(sampleGuests[0]!);
     await formPage.submit();
 
     // Проверяем переход на страницу подтверждения
     const successPage = new BookingSuccessPage(page);
     await successPage.expectLoaded();
-    await successPage.expectBookingDetailsVisible(sampleGuests[0].name, event.title);
+    await successPage.expectBookingDetailsVisible(sampleGuests[0]!.name, event.title);
   });
 
   test('должна валидировать обязательные поля', async ({ page }) => {
@@ -182,7 +182,7 @@ test.describe('Booking Form Page', () => {
     await formPage.goto(event.slug, slotTime);
     
     const guestWithNotes = {
-      ...sampleGuests[0],
+      ...sampleGuests[0]!,
       notes: 'Тестовые заметки для бронирования',
     };
     
@@ -209,7 +209,7 @@ test.describe('Booking Form Page', () => {
     // Создаём бронирование через API
     const booking = await apiClient.createBooking(event.slug, {
       startTime: slotTime,
-      guest: sampleGuests[1],
+      guest: sampleGuests[1]!,
     });
     createdBookings.push(booking);
 
@@ -217,7 +217,7 @@ test.describe('Booking Form Page', () => {
     const formPage = new BookingFormPage(page);
     await formPage.goto(event.slug, slotTime);
     
-    await formPage.fillGuestInfo(sampleGuests[2]);
+    await formPage.fillGuestInfo(sampleGuests[2]!);
     await formPage.submit();
 
     // Проверяем сообщение о конфликте
@@ -291,7 +291,7 @@ test.describe('Booking Success Page', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -299,7 +299,7 @@ test.describe('Booking Success Page', () => {
 
     const successPage = new BookingSuccessPage(page);
     await successPage.expectLoaded();
-    await successPage.expectBookingDetailsVisible(sampleGuests[0].name, event.title);
+    await successPage.expectBookingDetailsVisible(sampleGuests[0]!.name, event.title);
   });
 
   test('должна позволять отменить бронирование', async ({ page }) => {
@@ -314,7 +314,7 @@ test.describe('Booking Success Page', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -341,7 +341,7 @@ test.describe('Booking Success Page', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -368,7 +368,7 @@ test.describe('Booking Success Page', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 
@@ -393,7 +393,7 @@ test.describe('Booking Success Page', () => {
     const tomorrow = getTestDate(1);
     const booking = await apiClient.createBooking(event.slug, {
       startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0],
+      guest: sampleGuests[0]!,
     });
     createdBookings.push(booking);
 

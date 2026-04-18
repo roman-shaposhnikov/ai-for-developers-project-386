@@ -1,5 +1,26 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "globals": {
+    "Buffer": "readonly",
+    "btoa": "readonly",
+    "clearInterval": "readonly",
+    "clearTimeout": "readonly",
+    "console": "readonly",
+    "document": "readonly",
+    "fetch": "readonly",
+    "module": "readonly",
+    "navigator": "readonly",
+    "process": "readonly",
+    "require": "readonly",
+    "sessionStorage": "readonly",
+    "setInterval": "readonly",
+    "setTimeout": "readonly",
+    "URL": "readonly",
+    "URLSearchParams": "readonly",
+    "WebSocket": "readonly",
+    "window": "readonly",
+    "__dirname": "readonly"
+  },
   "plugins": [
     "react",
     "react-hooks",
@@ -38,6 +59,7 @@
     "react/no-string-refs": "error",
     "react/no-this-in-sfc": "error",
     "react/no-will-update-set-state": "error",
+    "react/react-in-jsx-scope": "off",
     "react/require-render-return": "error",
     "react/style-prop-object": "error",
     
@@ -63,9 +85,10 @@
   ],
   "overrides": [
     {
-      "files": ["**/*.test.{js,jsx,ts,tsx}", "**/*.spec.{js,jsx,ts,tsx}"],
+      "files": ["**/*.test.{js,jsx,ts,tsx}", "**/*.spec.{js,jsx,ts,tsx}", "e2e/**/*.{ts,tsx}"],
       "rules": {
-        "no-console": "off"
+        "no-console": "off",
+        "react-hooks/rules-of-hooks": "off"
       }
     },
     {

@@ -63,8 +63,8 @@ test.describe('Admin Schedule Management', () => {
 
     expect(updatedSchedule.weekdays.monday.enabled).toBe(true);
     expect(updatedSchedule.weekdays.monday.blocks).toHaveLength(2);
-    expect(updatedSchedule.weekdays.monday.blocks[0].start).toBe('10:00');
-    expect(updatedSchedule.weekdays.monday.blocks[0].end).toBe('12:00');
+    expect(updatedSchedule.weekdays.monday.blocks[0]!.start).toBe('10:00');
+    expect(updatedSchedule.weekdays.monday.blocks[0]!.end).toBe('12:00');
   });
 
   test('должна позволять отключить день недели', async () => {
@@ -164,8 +164,8 @@ test.describe('Admin Schedule Management', () => {
     for (const day of ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const) {
       expect(updatedSchedule.weekdays[day].enabled).toBe(true);
       expect(updatedSchedule.weekdays[day].blocks).toHaveLength(1);
-      expect(updatedSchedule.weekdays[day].blocks[0].start).toBe('09:00');
-      expect(updatedSchedule.weekdays[day].blocks[0].end).toBe('17:00');
+      expect(updatedSchedule.weekdays[day].blocks[0]!.start).toBe('09:00');
+      expect(updatedSchedule.weekdays[day].blocks[0]!.end).toBe('17:00');
     }
 
     expect(updatedSchedule.weekdays.saturday.enabled).toBe(false);
