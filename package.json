@@ -11,6 +11,9 @@
     "url": "git+https://github.com/roman-shaposhnikov/ai-for-developers-project-386.git"
   },
   "scripts": {
+    "backend:dev": "cd backend && npx ts-node src/main.ts",
+    "backend:build": "cd backend && npx tsc",
+    "backend:start": "cd backend && node dist/main.js",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
@@ -36,6 +39,7 @@
     "@mswjs/interceptors": "^0.41.3",
     "@playwright/cli": "^0.1.7",
     "@playwright/test": "^1.59.1",
+    "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "@typespec/compiler": "^1.11.0",
     "@typespec/http": "^1.11.0",
@@ -47,6 +51,7 @@
     "oxlint": "^1.59.0",
     "simple-git-hooks": "^2.13.1",
     "skills": "^1.4.9",
+    "ts-node": "^10.9.2",
     "typescript": "5.6"
   },
   "dependencies": {

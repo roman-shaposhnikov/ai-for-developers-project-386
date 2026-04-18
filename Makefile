@@ -1,7 +1,7 @@
 # Makefile — Запись на звонок (Book a Call)
 # Все команды разработки в одном месте
 
-.PHONY: help install dev frontend backend api lint lint-fix type-check test e2e mcp hooks dc clean
+.PHONY: help install dev frontend backend backend-build backend-start api lint lint-fix type-check test e2e mcp hooks dc clean
 
 # ==================== Основные команды ====================
 
@@ -11,9 +11,12 @@ help:
 	@echo ""
 	@echo "=== Локальная разработка ==="
 	@echo "  make install     — установить все зависимости"
-	@echo "  make dev         — запустить dev-режим (frontend)"
+	@echo "  make dev         — запустить dev-режим (frontend + backend)"
 	@echo "  make frontend    — запустить только frontend"
-	@echo "  make api         — скомпилировать API (TypeSpec → OpenAPI)"
+	@echo "  make backend         — запустить только backend (dev)"
+	@echo "  make backend-build   — собрать backend"
+	@echo "  make backend-start   — запустить собранный backend"
+	@echo "  make api             — скомпилировать API (TypeSpec → OpenAPI)"
 	@echo "  make lint        — запустить линтер (oxlint)"
 	@echo "  make lint-fix    — исправить ошибки линтера"
 	@echo "  make type-check  — проверить типы TypeScript"
@@ -61,16 +64,30 @@ frontend:
 	@echo "🚀 Запуск frontend на http://localhost:8080"
 	cd frontend && npm run dev
 
-# Запустить backend (когда будет готов)
+# Запустить backend dev-server
 backend:
-	@echo "🚀 Запуск backend..."
-	@echo "TODO: добавить команду запуска backend"
+	@echo "🚀 Запуск backend на http://localhost:3000"
+	cd backend && npx ts-node src/main.ts
 
-# Запустить все в dev-режиме
+# Собрать backend
+backend-build:
+	@echo "🔨 Сборка backend..."
+	cd backend && npx tsc
+
+# Запустить собранный backend
+backend-start:
+	@echo "🚀 Запуск production backend на http://localhost:3000"
+	cd backend && node dist/main.js
+
+# Запустить все в dev-режиме (frontend + backend)
 dev:
 	@echo "🚀 Запуск dev-режима..."
 	@echo "Frontend: http://localhost:8080"
-	cd frontend && npm run dev
+	@echo "Backend:  http://localhost:3000"
+	@trap 'kill %1; kill %2' EXIT; \
+		cd backend && npx ts-node src/main.ts & \
+		cd frontend && npm run dev & \
+		wait
 
 # ==================== Линтинг и типы ====================
 
