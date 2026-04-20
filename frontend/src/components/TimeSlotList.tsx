@@ -32,7 +32,7 @@ export function TimeSlotList({
 
   if (slots.length === 0) {
     return (
-      <Box>
+      <Box data-testid="no-slots">
         <Text fw={600} mb="md">
           {formatDayOfWeek(date)}, {formatDate(date)}
         </Text>
@@ -62,6 +62,7 @@ export function TimeSlotList({
               onClick={() => onSelect(slot)}
               fullWidth
               justify="flex-start"
+              data-testid="time-slot"
               leftSection={
                 <Box
                   style={{

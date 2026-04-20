@@ -147,7 +147,7 @@ export function EventsList() {
 
     if (events.length === 0) {
       return (
-        <Box py="xl">
+        <Box py="xl" data-testid="empty-state">
           <Text c="dimmed" ta="center" mb="lg">
             Пока нет ни одного типа события. Создайте первое событие, чтобы начать.
           </Text>

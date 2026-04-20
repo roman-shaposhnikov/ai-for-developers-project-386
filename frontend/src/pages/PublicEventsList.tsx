@@ -58,7 +58,7 @@ export function PublicEventsList() {
 
     if (error) {
       return (
-        <Alert icon={<IconAlertCircle size={18} />} title="Ошибка" color="red">
+        <Alert icon={<IconAlertCircle size={18} />} title="Ошибка" color="red" data-testid="error-message">
           {error}
         </Alert>
       );
@@ -66,7 +66,7 @@ export function PublicEventsList() {
 
     if (events.length === 0) {
       return (
-        <Alert icon={<IconAlertCircle size={18} />} title="Нет доступных событий" color="blue">
+        <Alert icon={<IconAlertCircle size={18} />} title="Нет доступных событий" color="blue" data-testid="empty-state">
           В настоящее время нет доступных событий для бронирования. Пожалуйста, проверьте позже.
         </Alert>
       );

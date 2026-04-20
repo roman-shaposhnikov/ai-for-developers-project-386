@@ -28,19 +28,19 @@ export function EventCard({
   const publicLink = `${window.location.origin}/e/${event.slug}`;
 
   return (
-    <Card withBorder shadow="sm" radius="md" p="md">
+    <Card withBorder shadow="sm" radius="md" p="md" data-testid="admin-event">
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Text fw={600} size="lg" truncate>
+          <Text fw={600} size="lg" truncate data-testid="event-title">
             {event.title}
           </Text>
           <Group gap="xs" mt={4}>
-            <Text c="dimmed" size="sm" truncate>
+            <Text c="dimmed" size="sm" truncate data-testid="event-slug">
               /{event.slug}
             </Text>
           </Group>
         </div>
-        <Badge variant="light" color="gray">
+        <Badge variant="light" color="gray" data-testid="event-duration">
           {formatDuration(event.duration)}
         </Badge>
       </Group>
@@ -59,6 +59,7 @@ export function EventCard({
           color="blue"
           onClick={() => onEdit(event.slug)}
           title="Редактировать"
+          data-testid="edit-button"
         >
           <IconEdit size={18} />
         </ActionIcon>
@@ -68,13 +69,14 @@ export function EventCard({
           color="gray"
           onClick={() => onCopyLink(publicLink)}
           title="Копировать ссылку"
+          data-testid="copy-link-button"
         >
           <IconLink size={18} />
         </ActionIcon>
 
         <Menu position="bottom-end" withArrow>
           <Menu.Target>
-            <ActionIcon variant="light" color="gray">
+            <ActionIcon variant="light" color="gray" data-testid="menu-button">
               <IconDots size={18} />
             </ActionIcon>
           </Menu.Target>
@@ -83,6 +85,7 @@ export function EventCard({
               color="red"
               leftSection={<IconTrash size={rem(14)} />}
               onClick={() => onDelete(event.slug)}
+              data-testid="delete-button"
             >
               Удалить
             </Menu.Item>

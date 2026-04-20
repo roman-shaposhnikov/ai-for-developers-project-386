@@ -109,7 +109,7 @@ export function EventBooking() {
   if (error || !event) {
     return (
       <PublicLayout>
-        <Alert icon={<IconAlertCircle size={18} />} title="Ошибка" color="red" mb="md">
+        <Alert icon={<IconAlertCircle size={18} />} title="Ошибка" color="red" mb="md" data-testid="error-message">
           {error || 'Событие не найдено'}
         </Alert>
         <Button component={Link} to="/" variant="light">
@@ -144,7 +144,7 @@ export function EventBooking() {
               </Box>
 
               <Box>
-                <Title order={3}>{event.title}</Title>
+                <Title order={3} data-testid="event-title">{event.title}</Title>
               </Box>
 
               <Group gap="xs">

@@ -156,7 +156,7 @@ export function BookingSuccess() {
         <Grid.Col span={{ base: 12, md: 8, lg: 6 }}>
           <Paper p="xl" withBorder radius="md">
             {isCancelled ? (
-              <Stack align="center" gap="md">
+              <Stack align="center" gap="md" data-testid="cancelled-state">
                 <Box
                   style={{
                     width: 60,
@@ -170,7 +170,7 @@ export function BookingSuccess() {
                 >
                   <IconCheck size={32} color="white" />
                 </Box>
-                <Title order={3} ta="center">Бронирование отменено</Title>
+                <Title order={3} ta="center" data-testid="cancelled-title">Бронирование отменено</Title>
                 <Text c="dimmed" ta="center">
                   Ваше бронирование было успешно отменено.
                 </Text>
@@ -180,7 +180,7 @@ export function BookingSuccess() {
               </Stack>
             ) : (
               <>
-                <Stack align="center" gap="md" mb="xl">
+                <Stack align="center" gap="md" mb="xl" data-testid="success-message">
                   <Box
                     style={{
                       width: 60,
@@ -197,7 +197,7 @@ export function BookingSuccess() {
                   <Title order={3} ta="center">Бронирование подтверждено</Title>
                 </Stack>
 
-                <Paper withBorder p="md" radius="md" mb="xl" bg="gray.0">
+                <Paper withBorder p="md" radius="md" mb="xl" bg="gray.0" data-testid="booking-details">
                   {booking && (
                     <>
                       <Text mb="xs">
@@ -206,10 +206,10 @@ export function BookingSuccess() {
                       </Text>
                       {booking.guest && (
                         <>
-                          <Text mb="xs">
+                          <Text mb="xs" data-testid="guest-name">
                             <strong>Гость:</strong> {booking.guest.name}
                           </Text>
-                          <Text mb="xs">
+                          <Text mb="xs" data-testid="guest-email">
                             <strong>Email:</strong> {booking.guest.email}
                           </Text>
                           {booking.guest.notes && (
@@ -231,6 +231,7 @@ export function BookingSuccess() {
                       onClick={handleCancel}
                       loading={isCancelling}
                       leftSection={<IconX size={18} />}
+                      data-testid="cancel-booking-button"
                     >
                       Отменить бронирование
                     </Button>

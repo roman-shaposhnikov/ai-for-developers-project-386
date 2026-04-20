@@ -120,7 +120,7 @@ export function BookingsList() {
 
     if (filteredBookings.length === 0) {
       return (
-        <Box py="xl" ta="center">
+        <Box py="xl" ta="center" data-testid="empty-state">
           <IconCalendar size={48} style={{ opacity: 0.3, marginBottom: 16 }} />
           <Text c="dimmed" size="lg">
             {activeTab === 'upcoming' && 'Нет предстоящих бронирований'}
@@ -142,11 +142,11 @@ export function BookingsList() {
             </Text>
             <Stack gap="xs">
               {dateBookings.map(booking => (
-                <Card key={booking.id} withBorder p="md">
+                <Card key={booking.id} withBorder p="md" data-testid="booking-item">
                   <Group justify="space-between" align="flex-start" wrap="nowrap">
                     <Group gap="md" wrap="nowrap">
                       <Box>
-                        <Text fw={600} size="lg">
+                        <Text fw={600} size="lg" data-testid="booking-time">
                           {formatTime(booking.startTime)}
                         </Text>
                         <Text c="dimmed" size="sm">
@@ -154,8 +154,8 @@ export function BookingsList() {
                         </Text>
                       </Box>
                       <Box>
-                        <Text fw={500}>{booking.event.title}</Text>
-                        <Text c="dimmed" size="sm">
+                        <Text fw={500} data-testid="event-title">{booking.event.title}</Text>
+                        <Text c="dimmed" size="sm" data-testid="guest-info">
                           {booking.guest.name} · {booking.guest.email}
                         </Text>
                       </Box>
@@ -170,7 +170,7 @@ export function BookingsList() {
                       {booking.status === 'active' && (
                         <Menu position="bottom-end" withArrow>
                           <Menu.Target>
-                            <ActionIcon variant="light" color="gray">
+                            <ActionIcon variant="light" color="gray" data-testid="booking-menu">
                               <IconDots size={18} />
                             </ActionIcon>
                           </Menu.Target>
@@ -180,6 +180,7 @@ export function BookingsList() {
                               leftSection={<IconTrash size={rem(14)} />}
                               onClick={() => handleCancel(booking.id)}
                               disabled={cancellingId === booking.id}
+                              data-testid="cancel-booking-button"
                             >
                               Отменить
                             </Menu.Item>

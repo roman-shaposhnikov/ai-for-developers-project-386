@@ -93,7 +93,7 @@ export function BookingFormPage() {
   if (error || !event || !slot) {
     return (
       <PublicLayout>
-        <Alert icon={<IconAlertCircle size={18} />} title="Ошибка" color="red" mb="md">
+        <Alert icon={<IconAlertCircle size={18} />} title="Ошибка" color="red" mb="md" data-testid="error-message">
           {error || 'Некорректные данные для бронирования'}
         </Alert>
         <Button component={Link} to={slug ? `/e/${slug}` : '/'} variant="light">

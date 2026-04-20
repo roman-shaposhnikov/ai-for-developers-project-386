@@ -1,232 +1,202 @@
+import { randomUUID } from 'crypto';
+import type { Event, Booking, GuestInfo } from '../../../frontend/src/api/types';
+
 /**
- * Тестовые данные и fixtures для E2E тестов
+ * Test data generators for E2E tests
+ * Used to create consistent test data via API calls
  */
 
-import type { Booking, CreateEventRequest, DaySchedule, Event, Guest, WeeklySchedule } from './types';
+// Backend URL for API calls
+export const BACKEND_URL = 'http://localhost:3000';
+export const FRONTEND_URL = 'http://localhost:8080';
 
-// ─── Event Fixtures ───
+/**
+ * Generate a unique slug from title
+ */
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .substring(0, 50);
+}
 
-export const sampleEvents: Event[] = [
-  {
-    id: 'event-1',
-    title: 'Intro Call',
-    description: 'A 30-minute introductory meeting to discuss your needs',
+/**
+ * Create a test event via API
+ */
+export async function createEvent(eventData: Partial<Event> & { title: string; duration: number }): Promise<Event> {
+  const slug = eventData.slug || generateSlug(eventData.title);
+  
+  const response = await fetch(`${BACKEND_URL}/api/v1/events`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: eventData.title,
+      slug,
+      duration: eventData.duration,
+      description: eventData.description || '',
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create event: ${response.status} ${await response.text()}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Update an event via API (for changing active status)
+ */
+export async function updateEvent(slug: string, updates: Partial<Event>): Promise<Event> {
+  const response = await fetch(`${BACKEND_URL}/api/v1/events/${slug}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to update event: ${response.status} ${await response.text()}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Delete an event via API
+ */
+export async function deleteEvent(slug: string): Promise<void> {
+  const response = await fetch(`${BACKEND_URL}/api/v1/events/${slug}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok && response.status !== 404) {
+    throw new Error(`Failed to delete event: ${response.status}`);
+  }
+}
+
+/**
+ * Get all events via API
+ */
+export async function getEvents(): Promise<Event[]> {
+  const response = await fetch(`${BACKEND_URL}/api/v1/events`);
+  
+  if (!response.ok) {
+    throw new Error(`Failed to get events: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get all bookings via API
+ */
+export async function getBookings(): Promise<Booking[]> {
+  const response = await fetch(`${BACKEND_URL}/api/v1/bookings`);
+  
+  if (!response.ok) {
+    throw new Error(`Failed to get bookings: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Create a booking via API
+ */
+export async function createBooking(
+  eventSlug: string,
+  startTime: string,
+  guest: GuestInfo
+): Promise<Booking> {
+  const response = await fetch(`${BACKEND_URL}/api/v1/public/events/${eventSlug}/bookings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      startTime,
+      guest,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create booking: ${response.status} ${await response.text()}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Cancel a booking via API (admin)
+ */
+export async function cancelBooking(bookingId: string): Promise<void> {
+  const response = await fetch(`${BACKEND_URL}/api/v1/bookings/${bookingId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok && response.status !== 404) {
+    throw new Error(`Failed to cancel booking: ${response.status}`);
+  }
+}
+
+/**
+ * Clear all test data
+ */
+export async function clearAllData(): Promise<void> {
+  // Delete all bookings first (to avoid FK-like constraints)
+  const bookings = await getBookings();
+  for (const booking of bookings) {
+    await cancelBooking(booking.id);
+  }
+
+  // Delete all events
+  const events = await getEvents();
+  for (const event of events) {
+    await deleteEvent(event.slug);
+  }
+}
+
+/**
+ * Standard test events
+ */
+export const testEvents = {
+  active: {
+    title: 'Test Consultation',
     duration: 30,
-    slug: 'intro-call',
-    active: true,
-    createdAt: '2026-04-01T10:00:00Z',
-    updatedAt: '2026-04-01T10:00:00Z',
+    description: 'Test description',
   },
-  {
-    id: 'event-2',
-    title: 'Discovery Call',
-    description: '60-minute deep dive into your project requirements',
+  activeLong: {
+    title: 'Test Architecture Session',
     duration: 60,
-    slug: 'discovery-call',
-    active: true,
-    createdAt: '2026-04-02T10:00:00Z',
-    updatedAt: '2026-04-02T10:00:00Z',
+    description: 'Long session for testing',
   },
-  {
-    id: 'event-3',
-    title: 'Quick Chat',
-    description: '15-minute quick discussion',
+  inactive: {
+    title: 'Test Inactive Event',
     duration: 15,
-    slug: 'quick-chat',
-    active: true,
-    createdAt: '2026-04-03T10:00:00Z',
-    updatedAt: '2026-04-03T10:00:00Z',
-  },
-  {
-    id: 'event-4',
-    title: 'Inactive Event',
-    description: 'This event is inactive and should not appear publicly',
-    duration: 30,
-    slug: 'inactive-event',
-    active: false,
-    createdAt: '2026-04-04T10:00:00Z',
-    updatedAt: '2026-04-04T10:00:00Z',
-  },
-];
-
-export const newEventData: CreateEventRequest = {
-  title: 'Consultation',
-  description: 'One-hour consultation session',
-  duration: 60,
-  slug: 'consultation',
-};
-
-export const invalidEventData = {
-  emptyTitle: {
-    title: '',
-    description: 'Test description',
-    duration: 30,
-    slug: 'test-event',
-  },
-  invalidSlug: {
-    title: 'Test Event',
-    description: 'Test description',
-    duration: 30,
-    slug: '123-invalid',
-  },
-  tooLongTitle: {
-    title: 'a'.repeat(101),
-    description: 'Test description',
-    duration: 30,
-    slug: 'test-event',
-  },
-  tooShortDuration: {
-    title: 'Test Event',
-    description: 'Test description',
-    duration: 4,
-    slug: 'test-event',
-  },
-  tooLongDuration: {
-    title: 'Test Event',
-    description: 'Test description',
-    duration: 481,
-    slug: 'test-event',
+    description: 'Should not be visible to guests',
   },
 };
-
-// ─── Schedule Fixtures ───
-
-export const defaultWeekdaySchedule: DaySchedule = {
-  enabled: true,
-  blocks: [
-    { start: '09:00', end: '12:00' },
-    { start: '14:00', end: '17:00' },
-  ],
-};
-
-export const fullDaySchedule: DaySchedule = {
-  enabled: true,
-  blocks: [
-    { start: '09:00', end: '17:00' },
-  ],
-};
-
-export const disabledDaySchedule: DaySchedule = {
-  enabled: false,
-  blocks: [],
-};
-
-export const defaultWeeklySchedule: WeeklySchedule = {
-  weekdays: {
-    monday: defaultWeekdaySchedule,
-    tuesday: defaultWeekdaySchedule,
-    wednesday: defaultWeekdaySchedule,
-    thursday: defaultWeekdaySchedule,
-    friday: defaultWeekdaySchedule,
-    saturday: disabledDaySchedule,
-    sunday: disabledDaySchedule,
-  },
-};
-
-export const fullWeeklySchedule: WeeklySchedule = {
-  weekdays: {
-    monday: fullDaySchedule,
-    tuesday: fullDaySchedule,
-    wednesday: fullDaySchedule,
-    thursday: fullDaySchedule,
-    friday: fullDaySchedule,
-    saturday: disabledDaySchedule,
-    sunday: disabledDaySchedule,
-  },
-};
-
-// ─── Guest Fixtures ───
-
-export const sampleGuests: Guest[] = [
-  {
-    name: 'Иван Петров',
-    email: 'ivan@example.com',
-    notes: 'Жду встречи с нетерпением',
-  },
-  {
-    name: 'Jane Doe',
-    email: 'jane@example.com',
-  },
-  {
-    name: 'John Smith',
-    email: 'john.smith@company.com',
-    notes: 'Discussing project details',
-  },
-];
-
-export const invalidGuestData = {
-  emptyName: {
-    name: '',
-    email: 'test@example.com',
-  },
-  invalidEmail: {
-    name: 'Test User',
-    email: 'invalid-email',
-  },
-  tooLongName: {
-    name: 'a'.repeat(101),
-    email: 'test@example.com',
-  },
-  tooLongNotes: {
-    name: 'Test User',
-    email: 'test@example.com',
-    notes: 'a'.repeat(501),
-  },
-};
-
-// ─── Booking Fixtures ───
-
-export const sampleBooking: Booking = {
-  id: 'booking-1',
-  eventId: 'event-1',
-  startTime: '2026-04-15T09:00:00Z',
-  status: 'active',
-  guest: sampleGuests[0]!,
-  createdAt: '2026-04-11T12:00:00Z',
-};
-
-// ─── Helper Functions ───
 
 /**
- * Генерирует уникальный slug для тестов
+ * Standard test guest
  */
-export function generateUniqueSlug(prefix: string = 'test'): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-}
+export const testGuest: GuestInfo = {
+  name: 'Test User',
+  email: 'test@example.com',
+  notes: 'Test booking notes',
+};
 
 /**
- * Генерирует уникальный email для тестов
+ * Generate a future date string (YYYY-MM-DD)
  */
-export function generateUniqueEmail(prefix: string = 'test'): string {
-  return `${prefix}-${Date.now()}@example.com`;
-}
-
-/**
- * Получает дату в формате YYYY-MM-DD для тестов
- * @param daysFromNow количество дней от сегодня (0 = сегодня)
- */
-export function getTestDate(daysFromNow: number = 1): string {
+export function getFutureDate(daysFromNow: number = 1): string {
   const date = new Date();
   date.setDate(date.getDate() + daysFromNow);
-  return date.toISOString().split('T')[0]!;
+  return date.toISOString().split('T')[0];
 }
 
 /**
- * Получает дату следующего понедельника
+ * Generate a time slot string for testing
  */
-export function getNextMonday(): string {
-  const date = new Date();
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1) + 7;
-  date.setDate(diff);
-  return date.toISOString().split('T')[0]!;
-}
-
-/**
- * Проверяет, является ли дата рабочим днём (пн-пт)
- */
-export function isWeekday(dateStr: string): boolean {
-  const date = new Date(dateStr);
-  const day = date.getDay();
-  return day >= 1 && day <= 5;
+export function getTimeSlot(date: string, hour: number, minute: number = 0): string {
+  return `${date}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00Z`;
 }

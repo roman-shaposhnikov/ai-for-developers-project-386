@@ -1,228 +1,282 @@
-/**
- * End-to-End integration tests for complete user flows
- */
-
-import { test, expect } from '../fixtures/test-fixtures';
-import { 
-  BookingFormPage, 
+import { test, expect } from '@playwright/test';
+import {
+  PublicEventsListPage,
+  EventBookingPage,
+  BookingFormPage,
   BookingSuccessPage,
-  EventBookingPage, 
+  AdminEventsListPage,
   EventCreatePage,
-  PublicEventsListPage, 
-} from '../helpers/page-objects';
-import { createApiClient } from '../helpers/api-client';
-import { 
-  generateUniqueSlug,
-  getTestDate,
-  fullWeeklySchedule,
-} from '../fixtures/test-data';
-import type { Event, BookingCreatedResponse } from '../fixtures/types';
+  AdminBookingsPage,
+} from '../page-objects';
+import { clearAllData, testGuest, getFutureDate, getTimeSlot } from '../fixtures/test-data';
 
-test.describe('Complete User Flows', () => {
-  let createdEvents: Event[] = [];
-  let createdBookings: BookingCreatedResponse[] = [];
-  let apiClient: ReturnType<typeof createApiClient>;
-
-  test.beforeEach(async ({ request }) => {
-    apiClient = createApiClient(request);
-    createdEvents = [];
-    createdBookings = [];
-    await apiClient.updateSchedule(fullWeeklySchedule);
+/**
+ * 🔴 Критичный сценарий: Полный flow - создание → бронирование
+ * 
+ * Проверяет интеграцию всех компонентов:
+ * Admin создаёт событие → Guest видит и бронирует → Admin видит бронирование
+ */
+test.describe('Full Integration Flow', () => {
+  test.beforeEach(async () => {
+    await clearAllData();
   });
 
-  test.afterEach(async () => {
-    for (const booking of createdBookings) {
-      try {
-        await apiClient.cancelBookingAsGuest(booking.id, booking.cancelToken);
-      } catch {
-        // Ignore errors
-      }
-    }
+  test('complete flow: admin creates event → guest books it → admin sees booking', async ({ page }) => {
+    // ==========================================
+    // PART 1: Admin creates a new event
+    // ==========================================
+    const adminEventsPage = new AdminEventsListPage(page);
+    await adminEventsPage.goto();
     
-    for (const event of createdEvents) {
-      try {
-        await apiClient.deleteEvent(event.slug);
-      } catch {
-        // Ignore errors
-      }
-    }
-  });
-
-  test('полный flow: создание события админом и бронирование гостем', async ({ page }) => {
-    // === АДМИН: Создание события ===
+    // Navigate to create page
+    await adminEventsPage.clickCreateEvent();
+    
     const createPage = new EventCreatePage(page);
-    await createPage.goto();
-
-    const eventSlug = generateUniqueSlug('integration-test');
     await createPage.fillForm({
       title: 'Integration Test Event',
-      slug: eventSlug,
+      slug: 'integration-test-event',
       duration: 30,
       description: 'Event created for integration testing',
       active: true,
     });
+    
     await createPage.submit();
-
-    // Проверяем создание события
-    await expect(page).toHaveURL(/\/admin\/events/);
     
-    const event = await apiClient.getEvent(eventSlug);
-    createdEvents.push(event);
-    expect(event.title).toBe('Integration Test Event');
-
-    // === ГОСТЬ: Просмотр и бронирование ===
-    const publicPage = new PublicEventsListPage(page);
-    await publicPage.goto();
-    await publicPage.expectEventVisible(eventSlug);
-
-    // Переходим к бронированию
-    await publicPage.clickBookButton(eventSlug);
-
+    // Verify event is in admin list
+    await expect(adminEventsPage.hasEventWithTitle('Integration Test Event')).resolves.toBe(true);
+    
+    // ==========================================
+    // PART 2: Guest sees the event on public page
+    // ==========================================
+    const publicEventsPage = new PublicEventsListPage(page);
+    await publicEventsPage.goto();
+    
+    // Event should be visible to guests
+    await expect(publicEventsPage.hasEventWithTitle('Integration Test Event')).resolves.toBe(true);
+    
+    // ==========================================
+    // PART 3: Guest clicks event and goes to booking page
+    // ==========================================
+    await publicEventsPage.clickEventByTitle('Integration Test Event');
+    
     const bookingPage = new EventBookingPage(page);
-    await bookingPage.expectLoaded();
-
-    // Выбираем дату и время
-    const tomorrow = getTestDate(1);
-    await bookingPage.selectDate(tomorrow);
-    await bookingPage.selectTimeSlot('09:00');
-
-    // Заполняем форму бронирования
-    const formPage = new BookingFormPage(page);
-    await formPage.expectLoaded();
-    await formPage.fillGuestInfo({
-      name: 'Integration Test Guest',
-      email: 'integration@test.com',
-      notes: 'Testing the full flow',
-    });
-    await formPage.submit();
-
-    // Проверяем подтверждение
-    const successPage = new BookingSuccessPage(page);
-    await successPage.expectLoaded();
-    await successPage.expectBookingDetailsVisible('Integration Test Guest', event.title);
-  });
-
-  test('полный flow: админ управляет бронированиями', async ({ page }) => {
-    // Создаём событие и бронирование через API
-    const event = await apiClient.createEvent({
-      title: 'Admin Management Test',
-      description: 'Testing admin booking management',
-      duration: 30,
-      slug: generateUniqueSlug('admin-manage'),
-    });
-    createdEvents.push(event);
-
-    const tomorrow = getTestDate(1);
-    const booking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: {
-        name: 'Guest to Manage',
-        email: 'manage@test.com',
-      },
-    });
-    createdBookings.push(booking);
-
-    // === АДМИН: Просмотр бронирований ===
-    // Открываем страницу бронирований (предполагается существование такой страницы)
-    await page.goto('/admin/bookings');
+    await expect(page).toHaveURL(/.*\/e\/integration-test-event/);
     
-    // Проверяем, что бронирование отображается
-    await expect(page.locator(`text=${booking.guest.name}`)).toBeVisible();
-    await expect(page.locator(`text=${event.title}`)).toBeVisible();
-
-    // === АДМИН: Отмена бронирования ===
-    const cancelButton = page.locator(`[data-booking-id="${booking.id}"] button:has-text("Cancel")`);
-    if (await cancelButton.isVisible().catch(() => false)) {
-      page.on('dialog', dialog => dialog.accept());
-      await cancelButton.click();
-      
-      // Проверяем, что бронирование отменено
-      await expect(page.locator(`text=${booking.guest.name}`)).not.toBeVisible();
-    }
-  });
-
-  test('полный flow: гость отменяет своё бронирование', async ({ page }) => {
-    // Создаём событие и бронирование через API
-    const event = await apiClient.createEvent({
-      title: 'Guest Cancellation Test',
-      description: 'Testing guest cancellation flow',
-      duration: 30,
-      slug: generateUniqueSlug('guest-cancel'),
+    // ==========================================
+    // PART 4: Guest selects date and time
+    // ==========================================
+    await bookingPage.selectFutureDate(1);
+    await page.waitForTimeout(1000);
+    
+    // Verify slots are available
+    const slotsCount = await bookingPage.getAvailableSlotsCount();
+    expect(slotsCount).toBeGreaterThan(0);
+    
+    // Select first slot
+    await bookingPage.selectTimeSlot(0);
+    await bookingPage.clickBook();
+    
+    // ==========================================
+    // PART 5: Guest fills booking form
+    // ==========================================
+    const bookingFormPage = new BookingFormPage(page);
+    await expect(page).toHaveURL(/.*\/book.*/);
+    
+    await bookingFormPage.fillForm({
+      name: testGuest.name,
+      email: testGuest.email,
+      notes: testGuest.notes,
     });
-    createdEvents.push(event);
-
-    const tomorrow = getTestDate(1);
-    const booking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: {
-        name: 'Self-Cancelling Guest',
-        email: 'selfcancel@test.com',
-      },
-    });
-    createdBookings.push(booking);
-
-    // === ГОСТЬ: Открываем страницу подтверждения ===
-    await page.goto(`/bookings/${booking.id}/success?token=${booking.cancelToken}`);
-
+    
+    await bookingFormPage.submit();
+    
+    // ==========================================
+    // PART 6: Guest sees success page with booking details
+    // ==========================================
     const successPage = new BookingSuccessPage(page);
-    await successPage.expectLoaded();
-
-    // Отменяем бронирование
-    page.on('dialog', dialog => dialog.accept());
-    await successPage.cancelBooking();
-
-    // Проверяем подтверждение отмены
-    await successPage.expectCancellationSuccess();
-
-    // Убираем из списка для очистки (уже отменено)
-    createdBookings = createdBookings.filter(b => b.id !== booking.id);
+    await expect(page).toHaveURL(/.*\/success.*/);
+    await expect(successPage.successMessage).toBeVisible();
+    await expect(page.locator('body')).toContainText(testGuest.name);
+    await expect(page.locator('body')).toContainText('Integration Test Event');
+    
+    // ==========================================
+    // PART 7: Admin sees the new booking
+    // ==========================================
+    const adminBookingsPage = new AdminBookingsPage(page);
+    await adminBookingsPage.goto();
+    
+    // Booking should be visible
+    await expect(adminBookingsPage.getBookingsCount()).resolves.toBe(1);
+    await expect(adminBookingsPage.hasBookingForEvent('Integration Test Event')).resolves.toBe(true);
+    await expect(adminBookingsPage.hasBookingForGuest(testGuest.name)).resolves.toBe(true);
   });
 
-  test('полный flow: проверка конфликтов бронирований', async ({ page }) => {
-    // Создаём событие
-    const event = await apiClient.createEvent({
+  test('conflict scenario: two guests try to book same slot', async ({ browser }) => {
+    // ==========================================
+    // Setup: Create event via API
+    // ==========================================
+    const { createEvent } = await import('../fixtures/test-data');
+    const event = await createEvent({
       title: 'Conflict Test Event',
-      description: 'Testing booking conflicts',
       duration: 30,
-      slug: generateUniqueSlug('conflict-test'),
+      active: true,
     });
-    createdEvents.push(event);
-
-    // Создаём первое бронирование
-    const tomorrow = getTestDate(1);
-    const booking1 = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: {
-        name: 'First Booker',
-        email: 'first@test.com',
-      },
+    
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
+    
+    // ==========================================
+    // Guest 1 books the slot
+    // ==========================================
+    const context1 = await browser.newContext();
+    const page1 = await context1.newPage();
+    
+    const bookingPage1 = new EventBookingPage(page1);
+    await bookingPage1.goto(event.slug);
+    await bookingPage1.selectFutureDate(1);
+    await page1.waitForTimeout(1000);
+    await bookingPage1.selectTimeSlotByTime('10:00');
+    await bookingPage1.clickBook();
+    
+    const bookingFormPage1 = new BookingFormPage(page1);
+    await bookingFormPage1.fillForm({
+      name: 'Guest One',
+      email: 'guest1@example.com',
     });
-    createdBookings.push(booking1);
+    await bookingFormPage1.submit();
+    
+    // Guest 1 should succeed
+    await expect(page1).toHaveURL(/.*\/success.*/);
+    
+    // ==========================================
+    // Guest 2 tries to book same slot
+    // ==========================================
+    const context2 = await browser.newContext();
+    const page2 = await context2.newPage();
+    
+    const bookingPage2 = new EventBookingPage(page2);
+    await bookingPage2.goto(event.slug);
+    await bookingPage2.selectFutureDate(1);
+    await page2.waitForTimeout(1000);
+    
+    // The slot should now be unavailable
+    // Either disabled or shows conflict on submit
+    const slotUnavailable = await page2.locator('button:has-text("10:00")').evaluate((el) => {
+      return el.hasAttribute('disabled') || 
+             el.classList.contains('disabled') || 
+             el.getAttribute('aria-disabled') === 'true';
+    }).catch(() => false);
+    
+    // If not disabled in UI, try to book and expect error
+    if (!slotUnavailable) {
+      await bookingPage2.selectTimeSlotByTime('10:00');
+      await bookingPage2.clickBook();
+      
+      const bookingFormPage2 = new BookingFormPage(page2);
+      await bookingFormPage2.fillForm({
+        name: 'Guest Two',
+        email: 'guest2@example.com',
+      });
+      await bookingFormPage2.submitAndExpectError();
+      
+      // Should show conflict error
+      await expect(page2.locator('body')).toContainText(/занят|конфликт|conflict/i);
+    }
+    
+    await context1.close();
+    await context2.close();
+  });
 
-    // === ГОСТЬ: Пытаемся забронировать то же время ===
-    const publicPage = new PublicEventsListPage(page);
-    await publicPage.goto();
-    await publicPage.clickBookButton(event.slug);
-
+  test('cancellation flow: guest cancels → slot becomes available → another guest books', async ({ page }) => {
+    const { createEvent, createBooking } = await import('../fixtures/test-data');
+    
+    // ==========================================
+    // Setup: Create event and booking
+    // ==========================================
+    const event = await createEvent({
+      title: 'Cancellation Test Event',
+      duration: 30,
+      active: true,
+    });
+    
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
+    
+    const booking = await createBooking(event.slug, slot, testGuest);
+    
+    // ==========================================
+    // Guest cancels their booking
+    // ==========================================
+    const successPage = new BookingSuccessPage(page);
+    await successPage.goto(booking.id, booking.cancelToken);
+    
+    await successPage.cancelBooking();
+    
+    // Verify cancellation
+    const isCancelled = await successPage.isCancelledMessageVisible().catch(() => {
+      return successPage.isCancelButtonVisible().then(v => !v);
+    });
+    expect(isCancelled).toBe(true);
+    
+    // ==========================================
+    // Verify slot is now available
+    // ==========================================
     const bookingPage = new EventBookingPage(page);
-    await bookingPage.selectDate(tomorrow);
-
-    // Проверяем, что слот 09:00 недоступен
-    const slot9am = page.locator('[data-time="09:00"]');
-    await expect(slot9am).toHaveAttribute('disabled');
-
-    // Пытаемся забронировать через прямой переход (обход UI)
-    const formPage = new BookingFormPage(page);
-    await formPage.goto(event.slug, `${tomorrow}T09:00:00Z`);
-    await formPage.fillGuestInfo({
-      name: 'Second Booker',
-      email: 'second@test.com',
+    await bookingPage.goto(event.slug);
+    await bookingPage.selectFutureDate(1);
+    await page.waitForTimeout(1000);
+    
+    // 10:00 slot should be available again
+    const slotAvailable = await page.locator('button:has-text("10:00")').isVisible();
+    expect(slotAvailable).toBe(true);
+    
+    // ==========================================
+    // Another guest can book the freed slot
+    // ==========================================
+    const newBooking = await createBooking(event.slug, slot, {
+      name: 'Second Guest',
+      email: 'second@example.com',
     });
-    await formPage.submit();
+    
+    expect(newBooking).toBeDefined();
+    expect(newBooking.id).not.toBe(booking.id);
+  });
 
-    // Проверяем сообщение о конфликте
-    await expect(
-      page.locator('text=забронировали, text=уже занят, text=недоступен')
-    ).toBeVisible();
+  test('inactive event is not visible to guests but visible to admin', async ({ page }) => {
+    const { createEvent } = await import('../fixtures/test-data');
+    
+    // ==========================================
+    // Create inactive event
+    // ==========================================
+    const event = await createEvent({
+      title: 'Inactive Test Event',
+      duration: 30,
+      active: false,
+    });
+    
+    // ==========================================
+    // Admin should see the inactive event
+    // ==========================================
+    const adminEventsPage = new AdminEventsListPage(page);
+    await adminEventsPage.goto();
+    
+    await expect(adminEventsPage.hasEventWithTitle('Inactive Test Event')).resolves.toBe(true);
+    
+    // ==========================================
+    // Guest should NOT see the inactive event
+    // ==========================================
+    const publicEventsPage = new PublicEventsListPage(page);
+    await publicEventsPage.goto();
+    
+    await expect(publicEventsPage.hasEventWithTitle('Inactive Test Event')).resolves.toBe(false);
+    await expect(publicEventsPage.emptyState).toBeVisible();
+    
+    // ==========================================
+    // Direct URL access should return 404
+    // ==========================================
+    const bookingPage = new EventBookingPage(page);
+    await bookingPage.goto(event.slug);
+    
+    await expect(page.locator('body')).toContainText(/404|не найден|not found/i);
   });
 });

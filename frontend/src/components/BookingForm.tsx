@@ -120,10 +120,10 @@ export function BookingForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} data-testid="booking-form">
       <Stack gap="md">
         {/* Selected Time Card */}
-        <Paper withBorder p="md" radius="md" bg="gray.0">
+        <Paper withBorder p="md" radius="md" bg="gray.0" data-testid="selected-time">
           <Title order={5} mb="sm">Выбранное время</Title>
           <Group gap="xs" mb="xs">
             <IconCalendar size={18} color="blue" />
@@ -135,7 +135,7 @@ export function BookingForm({
               {formatTime(slot.startTime)} – {formatTime(slot.endTime)} ({formatDuration(eventDuration)})
             </Text>
           </Group>
-          <Text fw={600}>{eventTitle}</Text>
+          <Text fw={600} data-testid="event-title">{eventTitle}</Text>
         </Paper>
 
         {/* Form Fields */}
@@ -151,6 +151,7 @@ export function BookingForm({
               onChange={(e) => setName(e.currentTarget.value)}
               error={errors.name}
               disabled={isSubmitting}
+              data-testid="name-input"
             />
 
             <TextInput
@@ -162,6 +163,7 @@ export function BookingForm({
               onChange={(e) => setEmail(e.currentTarget.value)}
               error={errors.email}
               disabled={isSubmitting}
+              data-testid="email-input"
             />
 
             <Textarea
@@ -172,6 +174,7 @@ export function BookingForm({
               value={notes}
               onChange={(e) => setNotes(e.currentTarget.value)}
               disabled={isSubmitting}
+              data-testid="notes-input"
             />
           </Stack>
         </Box>
@@ -182,6 +185,7 @@ export function BookingForm({
           color="blue"
           loading={isSubmitting}
           disabled={!name || !email}
+          data-testid="submit-booking"
         >
           Подтвердить бронирование
         </Button>

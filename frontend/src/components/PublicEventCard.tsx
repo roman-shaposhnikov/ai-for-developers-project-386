@@ -24,10 +24,10 @@ export function PublicEventCard({ event, onSelect }: PublicEventCardProps) {
   };
 
   return (
-    <Card withBorder shadow="sm" radius="md" p="lg">
+    <Card withBorder shadow="sm" radius="md" p="lg" data-testid="event-card">
       <Group gap="sm" mb="xs">
         <IconCalendar size={24} color="blue" />
-        <Text fw={700} size="lg">{event.title}</Text>
+        <Text fw={700} size="lg" data-testid="event-title">{event.title}</Text>
       </Group>
 
       <Text c="dimmed" size="sm" mb="md" lineClamp={3}>
@@ -45,6 +45,7 @@ export function PublicEventCard({ event, onSelect }: PublicEventCardProps) {
           fullWidth 
           variant="light"
           color="blue"
+          data-testid="select-time-button"
         >
           Выбрать время
         </Button>

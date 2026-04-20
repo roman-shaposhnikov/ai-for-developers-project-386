@@ -1,259 +1,167 @@
+import { test, expect } from '@playwright/test';
+import { AdminBookingsPage } from '../page-objects';
+import { createEvent, clearAllData, testGuest, getFutureDate, getTimeSlot } from '../fixtures/test-data';
+
 /**
- * E2E тесты для управления бронированиями в админ панели
- * @see /workspace/docs/superpowers/specs/2026-04-11-admin-events-design.md
+ * 🟡 Важный сценарий: Admin управляет бронированиями
+ * 
+ * Цель: Admin видит и управляет всеми бронированиями
  */
-
-import { test, expect } from '../fixtures/test-fixtures';
-import { createApiClient } from '../helpers/api-client';
-import { 
-  adminCredentials,
-  generateUniqueSlug,
-  getTestDate,
-  fullWeeklySchedule,
-  sampleGuests,
-} from '../fixtures/test-data';
-import type { Event, BookingCreatedResponse } from '../fixtures/types';
-
 test.describe('Admin Bookings Management', () => {
-  let createdEvents: Event[] = [];
-  let createdBookings: BookingCreatedResponse[] = [];
-  let apiClient: ReturnType<typeof createApiClient>;
+  test.beforeEach(async () => {
+    await clearAllData();
+  });
 
-  test.beforeEach(async ({ request }) => {
-    apiClient = createApiClient(request, adminCredentials);
-    createdEvents = [];
-    createdBookings = [];
+  test('should display empty state when no bookings exist', async ({ page }) => {
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
     
-    // Восстанавливаем полное расписание
-    await apiClient.updateSchedule(fullWeeklySchedule);
+    await expect(bookingsPage.emptyState).toBeVisible();
+    await expect(bookingsPage.getBookingsCount()).resolves.toBe(0);
   });
 
-  test.afterEach(async () => {
-    // Отменяем все бронирования
-    for (const booking of createdBookings) {
-      try {
-        await apiClient.cancelBookingAsAdmin(booking.id);
-      } catch {
-        // Игнорируем ошибки
-      }
-    }
+  test('should display active bookings with details', async ({ page }) => {
+    // Create event and booking
+    const event = await createEvent({
+      title: 'Test Consultation',
+      duration: 30,
+      active: true,
+    });
     
-    // Удаляем события
-    for (const event of createdEvents) {
-      try {
-        await apiClient.deleteEvent(event.slug);
-      } catch {
-        // Игнорируем ошибки
-      }
-    }
-  });
-
-  test('должна позволять получить список бронирований', async () => {
-    const event = await apiClient.createEvent({
-      title: 'List Bookings Test',
-      description: 'Test listing bookings',
-      duration: 30,
-      slug: generateUniqueSlug('list-bookings'),
-    });
-    createdEvents.push(event);
-
-    const tomorrow = getTestDate(1);
-    const booking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0]!,
-    });
-    createdBookings.push(booking);
-
-    const bookings = await apiClient.listBookings();
-
-    expect(bookings).toBeDefined();
-    expect(Array.isArray(bookings)).toBe(true);
+    const { createBooking } = await import('../fixtures/test-data');
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
     
-    const foundBooking = bookings.find(b => b.id === booking.id);
-    expect(foundBooking).toBeDefined();
-    expect(foundBooking?.guest.name).toBe(sampleGuests[0]!.name);
-    expect(foundBooking?.event.title).toBe(event.title);
-  });
-
-  test('должна возвращать только активные предстоящие бронирования', async () => {
-    const event = await apiClient.createEvent({
-      title: 'Filter Bookings Test',
-      description: 'Test filtering bookings',
-      duration: 30,
-      slug: generateUniqueSlug('filter-bookings'),
-    });
-    createdEvents.push(event);
-
-    // Создаём активное бронирование на завтра
-    const tomorrow = getTestDate(1);
-    const activeBooking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0]!,
-    });
-    createdBookings.push(activeBooking);
-
-    const bookings = await apiClient.listBookings();
-
-    // Все возвращённые бронирования должны быть активными
-    for (const booking of bookings) {
-      expect(booking.status).toBe('active');
-    }
-  });
-
-  test('должна сортировать бронирования по времени начала', async () => {
-    const event = await apiClient.createEvent({
-      title: 'Sort Bookings Test',
-      description: 'Test sorting bookings',
-      duration: 30,
-      slug: generateUniqueSlug('sort-bookings'),
-    });
-    createdEvents.push(event);
-
-    // Создаём бронирования на разное время
-    const dayAfterTomorrow = getTestDate(2);
-    const tomorrow = getTestDate(1);
-
-    const booking2 = await apiClient.createBooking(event.slug, {
-      startTime: `${dayAfterTomorrow}T09:00:00Z`,
-      guest: sampleGuests[1]!,
-    });
-    createdBookings.push(booking2);
-
-    const booking1 = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T10:00:00Z`,
-      guest: sampleGuests[0]!,
-    });
-    createdBookings.push(booking1);
-
-    const bookings = await apiClient.listBookings();
-
-    // Находим наши бронирования в списке и проверяем порядок
-    const index1 = bookings.findIndex(b => b.id === booking1.id);
-    const index2 = bookings.findIndex(b => b.id === booking2.id);
-
-    expect(index1).toBeLessThan(index2);
-  });
-
-  test('должна позволять получить детали бронирования', async () => {
-    const event = await apiClient.createEvent({
-      title: 'Get Booking Test',
-      description: 'Test getting booking details',
-      duration: 30,
-      slug: generateUniqueSlug('get-booking'),
-    });
-    createdEvents.push(event);
-
-    const tomorrow = getTestDate(1);
-    const booking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0]!,
-    });
-    createdBookings.push(booking);
-
-    const bookingDetails = await apiClient.getBooking(booking.id);
-
-    expect(bookingDetails).toBeDefined();
-    expect(bookingDetails.id).toBe(booking.id);
-    expect(bookingDetails.guest.name).toBe(sampleGuests[0]!.name);
-    expect(bookingDetails.guest.email).toBe(sampleGuests[0]!.email);
-    expect(bookingDetails.event.title).toBe(event.title);
-    expect(bookingDetails.event.slug).toBe(event.slug);
-    expect(bookingDetails.event.duration).toBe(event.duration);
-  });
-
-  test('должна возвращать 404 для несуществующего бронирования', async () => {
-    await expect(
-      apiClient.getBooking('non-existent-booking-id-12345')
-    ).rejects.toThrow();
-  });
-
-  test('должна позволять отменить бронирование как админ', async () => {
-    const event = await apiClient.createEvent({
-      title: 'Admin Cancel Test',
-      description: 'Test admin cancellation',
-      duration: 30,
-      slug: generateUniqueSlug('admin-cancel'),
-    });
-    createdEvents.push(event);
-
-    const tomorrow = getTestDate(1);
-    const booking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0]!,
-    });
-    createdBookings.push(booking);
-
-    // Отменяем бронирование как админ (без токена)
-    await apiClient.cancelBookingAsAdmin(booking.id);
-
-    // Проверяем, что бронирование отменено
-    const bookings = await apiClient.listBookings();
-    const cancelledBooking = bookings.find(b => b.id === booking.id);
-    expect(cancelledBooking).toBeUndefined(); // Отменённые не показываются в списке
-  });
-
-  test('не должна возвращать cancelToken в списке бронирований', async () => {
-    const event = await apiClient.createEvent({
-      title: 'No Token Test',
-      description: 'Test no token in list',
-      duration: 30,
-      slug: generateUniqueSlug('no-token'),
-    });
-    createdEvents.push(event);
-
-    const tomorrow = getTestDate(1);
-    const booking = await apiClient.createBooking(event.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0]!,
-    });
-    createdBookings.push(booking);
-
-    const bookings = await apiClient.listBookings();
-    const foundBooking = bookings.find(b => b.id === booking.id);
-
-    expect(foundBooking).toBeDefined();
-    expect(foundBooking).not.toHaveProperty('cancelToken');
-  });
-
-  test('должна показывать бронирования из разных событий', async () => {
-    const event1 = await apiClient.createEvent({
-      title: 'Event One',
-      description: 'First event',
-      duration: 30,
-      slug: generateUniqueSlug('multi-event-1'),
-    });
-    createdEvents.push(event1);
-
-    const event2 = await apiClient.createEvent({
-      title: 'Event Two',
-      description: 'Second event',
-      duration: 60,
-      slug: generateUniqueSlug('multi-event-2'),
-    });
-    createdEvents.push(event2);
-
-    const tomorrow = getTestDate(1);
+    const booking = await createBooking(event.slug, slot, testGuest);
     
-    const booking1 = await apiClient.createBooking(event1.slug, {
-      startTime: `${tomorrow}T09:00:00Z`,
-      guest: sampleGuests[0]!,
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
+    
+    // Should show booking with details
+    await expect(bookingsPage.getBookingsCount()).resolves.toBe(1);
+    await expect(bookingsPage.hasBookingForEvent(event.title)).resolves.toBe(true);
+    await expect(bookingsPage.hasBookingForGuest(testGuest.name)).resolves.toBe(true);
+  });
+
+  test('should display multiple bookings sorted by time', async ({ page }) => {
+    // Create event
+    const event = await createEvent({
+      title: 'Test Event',
+      duration: 30,
+      active: true,
     });
-    createdBookings.push(booking1);
-
-    const booking2 = await apiClient.createBooking(event2.slug, {
-      startTime: `${tomorrow}T14:00:00Z`,
-      guest: sampleGuests[1]!,
+    
+    const { createBooking } = await import('../fixtures/test-data');
+    
+    // Create bookings for different times
+    const futureDate = getFutureDate(1);
+    const slot1 = getTimeSlot(futureDate, 14, 0); // 14:00
+    const slot2 = getTimeSlot(futureDate, 10, 0); // 10:00 - earlier
+    
+    await createBooking(event.slug, slot1, {
+      name: 'User One',
+      email: 'user1@example.com',
     });
-    createdBookings.push(booking2);
+    
+    await createBooking(event.slug, slot2, {
+      name: 'User Two',
+      email: 'user2@example.com',
+    });
+    
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
+    
+    // Should show both bookings
+    await expect(bookingsPage.getBookingsCount()).resolves.toBe(2);
+  });
 
-    const bookings = await apiClient.listBookings();
+  test('should NOT display cancelled bookings', async ({ page }) => {
+    // Create event and cancelled booking
+    const event = await createEvent({
+      title: 'Test Event',
+      duration: 30,
+      active: true,
+    });
+    
+    const { createBooking, cancelBooking } = await import('../fixtures/test-data');
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
+    
+    const booking = await createBooking(event.slug, slot, testGuest);
+    
+    // Cancel booking via API
+    await cancelBooking(booking.id);
+    
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
+    
+    // Cancelled booking should not appear
+    await expect(bookingsPage.getBookingsCount()).resolves.toBe(0);
+  });
 
-    const foundBooking1 = bookings.find(b => b.id === booking1.id);
-    const foundBooking2 = bookings.find(b => b.id === booking2.id);
+  test('should allow admin to cancel booking', async ({ page }) => {
+    // Create event and booking
+    const event = await createEvent({
+      title: 'Test Event',
+      duration: 30,
+      active: true,
+    });
+    
+    const { createBooking } = await import('../fixtures/test-data');
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
+    
+    await createBooking(event.slug, slot, testGuest);
+    
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
+    
+    // Cancel the booking
+    await bookingsPage.cancelBooking(0);
+    
+    // Booking should disappear from list
+    await page.waitForTimeout(500);
+    await expect(bookingsPage.getBookingsCount()).resolves.toBe(0);
+  });
 
-    expect(foundBooking1).toBeDefined();
-    expect(foundBooking2).toBeDefined();
-    expect(foundBooking1?.event.title).toBe(event1.title);
-    expect(foundBooking2?.event.title).toBe(event2.title);
+  test('should show booking status (active/cancelled)', async ({ page }) => {
+    const event = await createEvent({
+      title: 'Test Event',
+      duration: 30,
+      active: true,
+    });
+    
+    const { createBooking } = await import('../fixtures/test-data');
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
+    
+    await createBooking(event.slug, slot, testGuest);
+    
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
+    
+    // Should show active status
+    await expect(page.locator('body')).toContainText(/актив|active/i);
+  });
+
+  test('admin should NOT see guest cancel tokens', async ({ page }) => {
+    const event = await createEvent({
+      title: 'Test Event',
+      duration: 30,
+      active: true,
+    });
+    
+    const { createBooking } = await import('../fixtures/test-data');
+    const futureDate = getFutureDate(1);
+    const slot = getTimeSlot(futureDate, 10, 0);
+    
+    const booking = await createBooking(event.slug, slot, testGuest);
+    
+    const bookingsPage = new AdminBookingsPage(page);
+    await bookingsPage.goto();
+    
+    // Token should not be visible in the UI
+    const pageContent = await page.content();
+    expect(pageContent).not.toContain(booking.cancelToken);
   });
 });

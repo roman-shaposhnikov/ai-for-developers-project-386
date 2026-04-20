@@ -1,10 +1,12 @@
 services:
+  # Devcontainer - интерактивная разработка + тесты
   devcontainer:
     user: "1000:1000"
     env_file:
       - ../config/env/dev.env
     build:
-      context: ./
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
       target: devcontainer
     working_dir: /workspace
     volumes:
@@ -15,4 +17,58 @@ services:
     tty: true
     stdin_open: true
     command: bash
+    networks:
+      - dev-network
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
 
+  # Frontend dev server
+  frontend:
+    user: "1000:1000"
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      target: devcontainer
+    working_dir: /workspace/frontend
+    volumes:
+      - ..:/workspace
+    ports:
+      - "5173:8080"
+    command: npm run dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dev-network
+
+  # Backend dev server
+  backend:
+    user: "1000:1000"
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      target: devcontainer
+    working_dir: /workspace/backend
+    volumes:
+      - ..:/workspace
+    ports:
+      - "3001:3000"
+    command: npx ts-node src/main.ts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge

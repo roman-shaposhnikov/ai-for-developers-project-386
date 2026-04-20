@@ -154,13 +154,14 @@ docker-build:
 docker-dev:
 	docker compose -f .devcontainer/compose.yaml up -d devcontainer frontend
 	@echo "Development environment started:"
-	@echo "  - Frontend: http://localhost:5173"
+	@echo "  - Frontend: http://localhost:8080"
+	@echo "  - Backend:  http://localhost:3000"
 	@echo "  - Dev Shell: docker compose -f .devcontainer/compose.yaml exec devcontainer bash"
 
 # Start only frontend service
 docker-frontend:
 	docker compose -f .devcontainer/compose.yaml up -d frontend
-	@echo "Frontend started at http://localhost:5173"
+	@echo "Frontend started at http://localhost:8080"
 
 # Run Playwright tests in devcontainer
 docker-test:
@@ -173,7 +174,6 @@ docker-test-file:
 # View test report from Docker
 docker-report:
 	docker compose -f .devcontainer/compose.yaml run --rm devcontainer npx playwright show-report
-	docker compose -f .devcontainer/compose.yaml run --rm tests npx playwright show-report
 
 # Stop all Docker services
 docker-stop:
@@ -204,4 +204,32 @@ clean:
 # Команды для CI (GitHub Actions)
 ci-check: install check
 
-ci-test: install-browsers e2e
+# Запуск E2E тестов в CI режиме (headless, с ретраями)
+ci-test: 
+	@echo "🧪 Запуск E2E тестов в CI режиме..."
+	CI=true npx playwright test
+
+# Запуск smoke tests (критичные сценарии)
+ci-smoke:
+	@echo "🔥 Запуск smoke tests..."
+	CI=true npx playwright test \
+		public/events.spec.ts \
+		public/booking.spec.ts \
+		public/booking-form.spec.ts \
+		--grep "Guest can view|Guest can book|Guest can cancel"
+
+# Подготовка Docker для CI
+ci-docker-build:
+	docker compose -f .devcontainer/compose.yaml build
+
+# Запуск тестов в Docker (как в CI)
+ci-docker-test: ci-docker-build
+	docker compose -f .devcontainer/compose.yaml up -d frontend backend
+	@sleep 30
+	@echo "✅ Services started, running tests..."
+	docker compose -f .devcontainer/compose.yaml run --rm devcontainer npm test
+	docker compose -f .devcontainer/compose.yaml down
+
+# Генерация и просмотр отчёта (локально)
+ci-report:
+	npx playwright show-report

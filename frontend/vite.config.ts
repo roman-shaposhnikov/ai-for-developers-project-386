@@ -318,6 +318,20 @@ export default defineConfig({
       }
     },
     {
+      name: 'health-check',
+      configureServer(server) {
+        // Health check endpoint
+        server.middlewares.use('/healthcheck', (req, res, next) => {
+          if (req.method === 'GET') {
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }))
+          } else {
+            next()
+          }
+        })
+      }
+    },
+    {
       name: 'console-logs-api',
       configureServer(server) {
         // API для получения логов

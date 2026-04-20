@@ -48,7 +48,7 @@ export function CalendarPicker({
   const monthYear = dayjs(currentMonth).locale('ru').format('MMMM YYYY');
 
   return (
-    <Box>
+    <Box data-testid="calendar">
       <Group justify="space-between" mb="md">
         <Text fw={600}>{monthYear}</Text>
         <Group gap="xs">
