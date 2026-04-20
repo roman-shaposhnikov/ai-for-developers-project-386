@@ -1,0 +1,8 @@
+[    1171ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=d7705ec1:14337
+[    1937ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[    1938ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[  346723ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=d7705ec1:14337
+[  347515ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[  347516ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[  350118ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=d7705ec1:14337
+[  357409ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=ce0637fb:14337

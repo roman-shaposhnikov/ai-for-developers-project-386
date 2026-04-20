@@ -1,0 +1,776 @@
+openapi: 3.0.0
+info:
+  title: Book a Call API
+  version: 0.0.0
+tags:
+  - name: 'Admin: Events'
+  - name: 'Admin: Schedule'
+  - name: 'Admin: Bookings'
+  - name: 'Public: Events'
+  - name: 'Public: Bookings'
+paths:
+  /api/v1/bookings:
+    get:
+      operationId: AdminBookings_list
+      description: |-
+        List upcoming active bookings across all event types.
+        Returns bookings where status=active and startTime >= now,
+        sorted by startTime ascending.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingWithEvent'
+      tags:
+        - 'Admin: Bookings'
+  /api/v1/bookings/{id}:
+    get:
+      operationId: AdminBookings_read
+      description: Get a single booking by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingWithEvent'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Bookings'
+    delete:
+      operationId: AdminBookings_cancel
+      description: Cancel a booking (owner, no token needed).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Bookings'
+  /api/v1/events:
+    post:
+      operationId: AdminEvents_create
+      description: Create a new event type.
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Events'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+    get:
+      operationId: AdminEvents_list
+      description: List all event types (includes inactive).
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+      tags:
+        - 'Admin: Events'
+  /api/v1/events/{slug}:
+    get:
+      operationId: AdminEvents_read
+      description: Get a single event type by slug.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Events'
+    patch:
+      operationId: AdminEvents_update
+      description: Update an event type. Slug is immutable.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Events'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventRequest'
+    delete:
+      operationId: AdminEvents_delete
+      description: Delete an event type. Fails if active bookings exist.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Events'
+  /api/v1/public/bookings/{id}:
+    delete:
+      operationId: PublicBookings_cancel
+      description: Cancel a booking (guest). Requires the cancel token from booking creation.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cancelToken
+          in: query
+          required: true
+          description: The cancel token received when the booking was created.
+          schema:
+            type: string
+          explode: false
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Public: Bookings'
+  /api/v1/public/events:
+    get:
+      operationId: PublicEvents_list
+      description: List active event types visible to guests.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+      tags:
+        - 'Public: Events'
+  /api/v1/public/events/{slug}:
+    get:
+      operationId: PublicEvents_read
+      description: Get a single active event type by slug.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Public: Events'
+  /api/v1/public/events/{slug}/bookings:
+    post:
+      operationId: PublicEvents_createBooking
+      description: Create a booking for an event.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingCreatedResponse'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Public: Events'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+  /api/v1/public/events/{slug}/slots:
+    get:
+      operationId: PublicEvents_getSlots
+      description: Get available slots for an event on a specific date.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          description: Date to query slots for (YYYY-MM-DD). Must be within the 14-day booking window.
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlotsResponse'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Public: Events'
+  /api/v1/schedule:
+    get:
+      operationId: AdminSchedule_get
+      description: Get the current weekly schedule.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklySchedule'
+      tags:
+        - 'Admin: Schedule'
+    put:
+      operationId: AdminSchedule_replace
+      description: Replace the entire weekly schedule.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklySchedule'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - 'Admin: Schedule'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeeklySchedule'
+components:
+  schemas:
+    Booking:
+      type: object
+      required:
+        - id
+        - eventId
+        - startTime
+        - status
+        - guest
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Server-generated unique identifier.
+          readOnly: true
+        eventId:
+          type: string
+          description: ID of the booked event type.
+          readOnly: true
+        startTime:
+          type: string
+          format: date-time
+          description: Booking start time in UTC.
+        status:
+          allOf:
+            - $ref: '#/components/schemas/BookingStatus'
+          description: Booking status.
+          readOnly: true
+        guest:
+          allOf:
+            - $ref: '#/components/schemas/Guest'
+          description: Guest contact information.
+        createdAt:
+          type: string
+          format: date-time
+          description: Server-generated creation timestamp.
+          readOnly: true
+      description: A booking created by a guest.
+    BookingCreatedResponse:
+      type: object
+      required:
+        - id
+        - eventId
+        - startTime
+        - status
+        - cancelToken
+        - guest
+        - createdAt
+      properties:
+        id:
+          type: string
+        eventId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        cancelToken:
+          type: string
+          description: One-time cancel token. Only returned on creation.
+        guest:
+          $ref: '#/components/schemas/Guest'
+        createdAt:
+          type: string
+          format: date-time
+      description: Response returned when a booking is created. Includes the one-time cancelToken.
+    BookingStatus:
+      type: string
+      enum:
+        - active
+        - cancelled
+      description: Booking status.
+    BookingWithEvent:
+      type: object
+      required:
+        - id
+        - eventId
+        - startTime
+        - status
+        - guest
+        - createdAt
+        - event
+      properties:
+        id:
+          type: string
+        eventId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        guest:
+          $ref: '#/components/schemas/Guest'
+        createdAt:
+          type: string
+          format: date-time
+        event:
+          allOf:
+            - $ref: '#/components/schemas/EventSummary'
+          description: Summary of the associated event type.
+      description: Booking with nested event summary, returned in admin list/detail views.
+    CreateBookingRequest:
+      type: object
+      required:
+        - startTime
+        - guest
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: Desired slot start time in UTC. Must align with a valid slot.
+        guest:
+          allOf:
+            - $ref: '#/components/schemas/Guest'
+          description: Guest contact information.
+      description: Request body for creating a booking.
+    CreateEventRequest:
+      type: object
+      required:
+        - title
+        - description
+        - duration
+        - slug
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        duration:
+          type: integer
+          format: int32
+          minimum: 5
+          maximum: 480
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 60
+          pattern: ^[a-z][a-z0-9-]*$
+      description: Request body for creating an event.
+    DaySchedule:
+      type: object
+      required:
+        - enabled
+        - blocks
+      properties:
+        enabled:
+          type: boolean
+          description: Whether this day is available for bookings.
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeBlock'
+          description: Time blocks available on this day. Must not overlap.
+      description: Schedule configuration for a single day of the week.
+    ErrorBody:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      description: Standard error response.
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorBody'
+    Event:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - duration
+        - slug
+        - active
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: Server-generated unique identifier.
+          readOnly: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Event title (1-100 characters).
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Event description (1-1000 characters).
+        duration:
+          type: integer
+          format: int32
+          minimum: 5
+          maximum: 480
+          description: Event duration in minutes (5-480).
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 60
+          pattern: ^[a-z][a-z0-9-]*$
+          description: |-
+            URL-friendly identifier. Lowercase alphanumeric and hyphens,
+            must start with a letter. Immutable after creation.
+        active:
+          type: boolean
+          description: 'Whether the event is visible to guests. Default: true.'
+        createdAt:
+          type: string
+          format: date-time
+          description: Server-generated creation timestamp.
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          description: Server-generated last update timestamp.
+          readOnly: true
+      description: An event type that guests can book.
+    EventSummary:
+      type: object
+      required:
+        - title
+        - slug
+        - duration
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        duration:
+          type: integer
+          format: int32
+      description: Abbreviated event info embedded in booking responses.
+    Guest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Guest full name (1-100 characters).
+        email:
+          type: string
+          format: email
+          description: Guest email address.
+        notes:
+          type: string
+          maxLength: 500
+          description: Optional notes from the guest (max 500 characters).
+      description: Guest contact information provided when creating a booking.
+    Slot:
+      type: object
+      required:
+        - startTime
+        - endTime
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: Slot start time in UTC.
+        endTime:
+          type: string
+          format: date-time
+          description: Slot end time in UTC (startTime + event duration).
+      description: A computed available time slot.
+    SlotsResponse:
+      type: object
+      required:
+        - date
+        - eventSlug
+        - duration
+        - slots
+      properties:
+        date:
+          type: string
+          description: The queried date (YYYY-MM-DD).
+        eventSlug:
+          type: string
+          description: Slug of the event type.
+        duration:
+          type: integer
+          format: int32
+          description: Duration of the event in minutes.
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+          description: Available time slots.
+      description: Response for the available slots query.
+    TimeBlock:
+      type: object
+      required:
+        - start
+        - end
+      properties:
+        start:
+          type: string
+          pattern: ^([01]\d|2[0-3]):[0-5][05]$
+          description: Block start time in HH:MM format (UTC).
+        end:
+          type: string
+          pattern: ^([01]\d|2[0-3]):[0-5][05]$
+          description: Block end time in HH:MM format (UTC). Must be after start.
+      description: A time block within a day (e.g. 09:00-12:00).
+    UpdateEventRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        duration:
+          type: integer
+          format: int32
+          minimum: 5
+          maximum: 480
+        active:
+          type: boolean
+      description: Request body for updating an event. Slug is immutable.
+    Weekdays:
+      type: object
+      required:
+        - monday
+        - tuesday
+        - wednesday
+        - thursday
+        - friday
+        - saturday
+        - sunday
+      properties:
+        monday:
+          $ref: '#/components/schemas/DaySchedule'
+        tuesday:
+          $ref: '#/components/schemas/DaySchedule'
+        wednesday:
+          $ref: '#/components/schemas/DaySchedule'
+        thursday:
+          $ref: '#/components/schemas/DaySchedule'
+        friday:
+          $ref: '#/components/schemas/DaySchedule'
+        saturday:
+          $ref: '#/components/schemas/DaySchedule'
+        sunday:
+          $ref: '#/components/schemas/DaySchedule'
+    WeeklySchedule:
+      type: object
+      required:
+        - weekdays
+      properties:
+        weekdays:
+          $ref: '#/components/schemas/Weekdays'
+      description: Owner's weekly availability schedule (singleton).
+servers:
+  - url: http://localhost:3000
+    description: Development server
+    variables: {}

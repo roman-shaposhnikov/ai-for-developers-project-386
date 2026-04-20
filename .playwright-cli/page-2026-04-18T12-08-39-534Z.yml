@@ -1,0 +1,19 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "Book a Call" [ref=e7] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e8]:
+        - img [ref=e9]
+        - paragraph [ref=e12]: Book a Call
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - heading "Забронировать встречу" [level=2] [ref=e15]
+      - paragraph [ref=e16]: Выберите тип встречи, чтобы посмотреть доступное время
+      - alert "Ошибка" [ref=e17]:
+        - generic [ref=e18]:
+          - img [ref=e20]
+          - generic [ref=e22]:
+            - generic [ref=e24]: Ошибка
+            - generic [ref=e25]: Failed to fetch
+  - contentinfo [ref=e26]:
+    - paragraph [ref=e29]: © 2026 Book a Call. Все права защищены.

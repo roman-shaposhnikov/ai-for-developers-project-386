@@ -1,0 +1,28 @@
+[    1209ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=ce0637fb:14337
+[    1892ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3160
+[    1893ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3161
+[    1893ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3162
+[    1893ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3163
+[    1893ms] [LOG] Client ID: %s (%s) ea59f8a3-f05d-4699-808f-ee29f215443c top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3164
+[    2422ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[    2518ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[    9529ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=ce0637fb:14337
+[    9972ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3160
+[    9972ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3161
+[    9973ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3162
+[    9973ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3163
+[    9977ms] [LOG] Client ID: %s (%s) 7a35816c-5613-477c-8e0b-8c2e5622dfb7 top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=ce0637fb:3164
+[    9977ms] [LOG] [MSW] Mock Service Worker started @ http://localhost:8080/src/main.tsx?t=1776514535841:24
+[   10213ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[   10354ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[   49920ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968
+[   54127ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=492dc9de:14337
+[   54675ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=57bc1294:3160
+[   54675ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=57bc1294:3161
+[   54675ms] [LOG] Worker script URL: http://localhost:8080/mockServiceWorker.js @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=57bc1294:3162
+[   54676ms] [LOG] Worker scope: http://localhost:8080/ @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=57bc1294:3163
+[   54676ms] [LOG] Client ID: %s (%s) 5a21b6bd-e12c-4c82-8e55-837705b852e1 top-level @ http://localhost:8080/node_modules/.vite/deps/msw_browser.js?v=57bc1294:3164
+[   54676ms] [LOG] [MSW] Mock Service Worker started @ http://localhost:8080/src/main.tsx:24
+[   55062ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[   55143ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/v1/public/events:0
+[  255050ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968

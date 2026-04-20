@@ -1,0 +1,61 @@
+[    1415ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:14337
+[    1947ms] [ERROR] Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. @ http://localhost:8080/node_modules/.vite/deps/react-CX1Endva.js?v=22044551:296
+[    1961ms] [ERROR] Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. @ http://localhost:8080/node_modules/.vite/deps/react-CX1Endva.js?v=22044551:296
+[    1996ms] TypeError: Cannot read properties of null (reading 'useRef')
+    at exports.useRef (http://localhost:8080/node_modules/.vite/deps/react-CX1Endva.js?v=22044551:745:30)
+    at useProviderColorScheme (http://localhost:8080/node_modules/.vite/deps/esm-CbnlQCh6.js?v=22044551:2511:40)
+    at MantineProvider (http://localhost:8080/node_modules/.vite/deps/esm-CbnlQCh6.js?v=22044551:3406:60)
+    at Object.react_stack_bottom_frame (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:12868:12)
+    at renderWithHooks (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:4213:19)
+    at updateFunctionComponent (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:5569:16)
+    at beginWork (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:6140:20)
+    at runWithFiberInDEV (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:851:66)
+    at performUnitOfWork (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:8429:92)
+    at workLoopSync (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:8325:37)
+[    1977ms] [WARNING] %s
+
+%s
+ An error occurred in the <@mantine/core/MantineProvider> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:5257
+[   85225ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:14337
+[   85467ms] [ERROR] Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. @ http://localhost:8080/node_modules/.vite/deps/react-CX1Endva.js?v=22044551:296
+[   85469ms] [ERROR] Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem. @ http://localhost:8080/node_modules/.vite/deps/react-CX1Endva.js?v=22044551:296
+[   85475ms] TypeError: Cannot read properties of null (reading 'useRef')
+    at exports.useRef (http://localhost:8080/node_modules/.vite/deps/react-CX1Endva.js?v=22044551:745:30)
+    at useProviderColorScheme (http://localhost:8080/node_modules/.vite/deps/esm-CbnlQCh6.js?v=22044551:2511:40)
+    at MantineProvider (http://localhost:8080/node_modules/.vite/deps/esm-CbnlQCh6.js?v=22044551:3406:60)
+    at Object.react_stack_bottom_frame (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:12868:12)
+    at renderWithHooks (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:4213:19)
+    at updateFunctionComponent (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:5569:16)
+    at beginWork (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:6140:20)
+    at runWithFiberInDEV (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:851:66)
+    at performUnitOfWork (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:8429:92)
+    at workLoopSync (http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:8325:37)
+[   85472ms] [WARNING] %s
+
+%s
+ An error occurred in the <@mantine/core/MantineProvider> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=22044551:5257
+[   97226ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:8080/@vite/client:968
+[  102633ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=d7705ec1:14337
+[  103488ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[  103489ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[  116740ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:8080/node_modules/.vite/deps/react-dom_client.js?v=d7705ec1:14337
+[  117216ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0
+[  117217ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/api/v1/public/events:0

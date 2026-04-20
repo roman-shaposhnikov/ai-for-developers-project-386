@@ -1,0 +1,102 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "globals": {
+    "Buffer": "readonly",
+    "btoa": "readonly",
+    "clearInterval": "readonly",
+    "clearTimeout": "readonly",
+    "console": "readonly",
+    "document": "readonly",
+    "fetch": "readonly",
+    "module": "readonly",
+    "navigator": "readonly",
+    "process": "readonly",
+    "require": "readonly",
+    "sessionStorage": "readonly",
+    "setInterval": "readonly",
+    "setTimeout": "readonly",
+    "URL": "readonly",
+    "URLSearchParams": "readonly",
+    "WebSocket": "readonly",
+    "window": "readonly",
+    "__dirname": "readonly"
+  },
+  "plugins": [
+    "react",
+    "react-hooks",
+    "typescript",
+    "import",
+    "node",
+    "promise"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "off",
+    "style": "warn",
+    "restriction": "off",
+    "nursery": "off"
+  },
+  "rules": {
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-unused-vars": "error",
+    "no-undef": "error",
+    "no-empty-function": "warn",
+    "no-empty-pattern": "error",
+    "no-empty": "warn",
+    "no-var": "error",
+    "prefer-const": "warn",
+    "eqeqeq": ["error", "always"],
+    
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "warn",
+    
+    "react/no-danger": "error",
+    "react/no-find-dom-node": "error",
+    "react/no-is-mounted": "error",
+    "react/no-render-return-value": "error",
+    "react/no-string-refs": "error",
+    "react/no-this-in-sfc": "error",
+    "react/no-will-update-set-state": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/require-render-return": "error",
+    "react/style-prop-object": "error",
+    
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    
+    "node/no-exports-assign": "error",
+    
+    "import/no-self-import": "error",
+    
+    "promise/param-names": "warn"
+  },
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "build",
+    "api/generated",
+    "coverage",
+    "*.config.js",
+    "*.config.ts",
+    "playwright-report",
+    "test-results"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.test.{js,jsx,ts,tsx}", "**/*.spec.{js,jsx,ts,tsx}", "e2e/**/*.{ts,tsx}"],
+      "rules": {
+        "no-console": "off",
+        "react-hooks/rules-of-hooks": "off"
+      }
+    },
+    {
+      "files": ["**/*.d.ts"],
+      "rules": {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Build Docker images
+        run: |
+          docker compose -f .devcontainer/compose.yaml build
+
+      - name: Start services
+        run: |
+          docker compose -f .devcontainer/compose.yaml up -d frontend backend
+          # Wait for services to be healthy
+          sleep 30
+
+      - name: Check services health
+        run: |
+          # Check frontend
+          curl -f http://localhost:8080/healthcheck || exit 1
+          # Check backend
+          curl -f http://localhost:3000/health || exit 1
+          echo "✅ Services are healthy"
+
+      - name: Run E2E tests
+        run: |
+          docker compose -f .devcontainer/compose.yaml run --rm devcontainer npm test
+        env:
+          CI: true
+          BASE_URL: http://localhost:8080
+          API_URL: http://localhost:3000/api/v1
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/**/*.png
+          retention-days: 7
+
+      - name: Stop services
+        if: always()
+        run: |
+          docker compose -f .devcontainer/compose.yaml down
+
+  # Smoke tests - быстрая проверка критичных сценариев
+  smoke-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-smoke-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-smoke-
+
+      - name: Build Docker images
+        run: |
+          docker compose -f .devcontainer/compose.yaml build
+
+      - name: Start services
+        run: |
+          docker compose -f .devcontainer/compose.yaml up -d frontend backend
+          sleep 30
+
+      - name: Check services health
+        run: |
+          curl -f http://localhost:8080/healthcheck || exit 1
+          curl -f http://localhost:3000/health || exit 1
+
+      - name: Run smoke tests
+        run: |
+          docker compose -f .devcontainer/compose.yaml run --rm devcontainer npx playwright test \
+            public/events.spec.ts \
+            public/booking.spec.ts \
+            public/booking-form.spec.ts \
+            --grep "smoke|Guest|create|cancel"
+        env:
+          CI: true
+          BASE_URL: http://localhost:8080
+          API_URL: http://localhost:3000/api/v1
+
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 3
+
+      - name: Stop services
+        if: always()
+        run: |
+          docker compose -f .devcontainer/compose.yaml down
