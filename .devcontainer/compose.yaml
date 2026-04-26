@@ -1,18 +1,20 @@
-x-common-user: &common-user
-  user: "1000:1000"
+name: hexlet
 
 services:
   devcontainer:
-    <<: *common-user
+    user: node
     env_file:
       - ../config/env/.env
     build:
-      context: ./
+      context: .
       target: devcontainer
     volumes:
       - ..:/workspace
+      - devcontainer:/home/node/.claude
     tty: true
     stdin_open: true
     working_dir: /workspace
     command: bash
 
+volumes:
+  devcontainer:
