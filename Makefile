@@ -6,4 +6,3 @@ dc:
 
 dcr:
 	docker compose -f .devcontainer/compose.yaml run --build --rm devcontainer
-
