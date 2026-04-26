@@ -13,6 +13,7 @@
     "npm": "^11.6.0"
   },
   "dependencies": {
+    "agent-browser": "^0.26.0",
     "skills": "^1.5.0"
   }
 }
