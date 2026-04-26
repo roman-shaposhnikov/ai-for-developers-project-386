@@ -15,6 +15,8 @@ services:
     stdin_open: true
     working_dir: /workspace
     command: bash
+    ports:
+      - "8080:8080"
 
 volumes:
   devcontainer:

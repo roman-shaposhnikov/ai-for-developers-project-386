@@ -4,4 +4,7 @@ RUN apt-get install -y ripgrep
 
 FROM base as devcontainer
 RUN npm install -g opencode-ai
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN npm install -g @anthropic-ai/claude-code
+
+EXPOSE 8080
+EXPOSE 3000
