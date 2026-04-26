@@ -4,7 +4,7 @@
   "type": "module",
   "workspaces": [
     "services/back/*",
-    "services/front/*",
+    "services/front",
     "e2e",
     "api"
   ],
