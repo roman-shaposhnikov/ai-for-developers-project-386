@@ -718,6 +718,9 @@ components:
           pattern: ^([01]\d|2[0-3]):[0-5][05]$
           description: Block end time in HH:MM format (UTC). Must be after start.
       description: A time block within a day (e.g. 09:00-12:00).
+      example:
+        start: '09:00'
+        end: '17:00'
     UpdateEventRequest:
       type: object
       properties:

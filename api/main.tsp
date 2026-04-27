@@ -52,6 +52,7 @@ model Slot {
 }
 
 /** A time block within a day (e.g. 09:00-12:00). */
+@example(#{ start: "09:00", end: "17:00" })
 model TimeBlock {
   /** Block start time in HH:MM format (UTC). */
   @pattern("^([01]\\d|2[0-3]):[0-5][05]$")

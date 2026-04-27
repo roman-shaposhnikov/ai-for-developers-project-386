@@ -349,7 +349,13 @@ export interface components {
             /** @description Available time slots. */
             slots: components["schemas"]["Slot"][];
         };
-        /** @description A time block within a day (e.g. 09:00-12:00). */
+        /**
+         * @description A time block within a day (e.g. 09:00-12:00).
+         * @example {
+         *       "start": "09:00",
+         *       "end": "17:00"
+         *     }
+         */
         TimeBlock: {
             /** @description Block start time in HH:MM format (UTC). */
             start: string;

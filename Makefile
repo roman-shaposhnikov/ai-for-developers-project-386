@@ -7,16 +7,24 @@ dc:
 dcr:
 	docker compose -f .devcontainer/compose.yaml run --build -p 8080:8080 -p 3000:3000 --rm devcontainer
 
+# ==================== API contract ====================
+
+# Перегенерировать api/generated/openapi.yaml из api/main.tsp.
+api-gen:
+	npm --workspace=api run gen
+
 # ==================== Frontend ====================
 
-api-front:
+# Сгенерировать TS-типы фронта из openapi.yaml. Сначала обновляем сам yaml.
+api-front: api-gen
 	npm --workspace=services/front run gen:api
 
 dev-front:
 	npm --workspace=services/front run dev
 
 # Prism mock + Vite. Prism mocks the contract on :3000, Vite serves SPA on :8080.
-dev-front-mock:
+# Перед стартом регенерируем схему, чтобы мок и SPA шли с одного контракта.
+dev-front-mock: api-gen
 	npx -y -p '@stoplight/prism-cli' prism mock api/generated/openapi.yaml -p 3000 & \
 	  PRISM_PID=$$!; \
 	  trap "kill $$PRISM_PID 2>/dev/null" EXIT; \
