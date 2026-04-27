@@ -5,7 +5,7 @@ import { env } from '../config/env';
 export const api = createClient<paths>({
   baseUrl: env.apiBaseUrl,
   // Defer to current globalThis.fetch so tests can stub it after this module loads.
-  fetch: (input, init) => globalThis.fetch(input, init),
+  fetch: (request) => globalThis.fetch(request),
 });
 
 export class ApiError extends Error {

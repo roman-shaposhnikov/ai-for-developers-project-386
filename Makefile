@@ -63,3 +63,18 @@ test-e:
 	@echo "no e2e tests yet"
 
 test: test-u test-i test-e
+
+# ==================== Build & Docker (prod) ====================
+
+IMAGE ?= cal
+PORT ?= 3000
+
+build:
+	npm --workspace=services/back run build
+	npm --workspace=services/front run build
+
+docker-build:
+	docker build -t $(IMAGE) .
+
+docker-run:
+	docker run --rm -p $(PORT):$(PORT) -e PORT=$(PORT) $(IMAGE)

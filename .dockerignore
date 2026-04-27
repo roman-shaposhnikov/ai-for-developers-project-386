@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+.git
+.gitignore
+.github
+.devcontainer
+.agents
+.claude
+docs
+prompts
+e2e/src
+*.md
+.env*
+config/env
+local/
+.worktrees
+tmp.md
