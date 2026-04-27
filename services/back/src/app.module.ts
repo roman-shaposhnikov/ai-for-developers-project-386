@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 import { EventsRepository } from './dal/events.repo';
 import { BookingsRepository } from './dal/bookings.repo';
 import { ScheduleRepository } from './dal/schedule.repo';
@@ -14,6 +16,13 @@ import { PublicEventsController } from './controllers/public/events.controller';
 import { PublicBookingsController } from './controllers/public/bookings.controller';
 
 @Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: process.env.STATIC_ROOT ?? join(process.cwd(), 'public'),
+      exclude: ['/api/(.*)'],
+      serveStaticOptions: { fallthrough: true },
+    }),
+  ],
   controllers: [
     AdminEventsController,
     AdminScheduleController,
